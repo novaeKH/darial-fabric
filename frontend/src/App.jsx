@@ -518,10 +518,12 @@ export default function App() {
     <div className="app-shell">
       <aside className="sidebar">
         <div className="brand">
-          <div className="brand-logo">SWF</div>
+          <div className="brand-logo" aria-label="Ancile logo">
+            <Shield size={30} strokeWidth={2.2} />
+          </div>
           <div>
-            <div className="brand-title">Secure Workspace</div>
-            <div className="brand-subtitle">Панель управления агентами</div>
+            <div className="brand-title">Ancile</div>
+            <div className="brand-subtitle">Защитный слой для AI-агентов</div>
           </div>
         </div>
 
@@ -553,8 +555,8 @@ export default function App() {
           <div>
             <h1>{tabs.find((t) => t.id === activeTab)?.label}</h1>
             <p>
-              Панель управления зашифрованными файлами агентов, политиками доступа,
-              аудитом и автоматическими сценариями.
+              Ancile контролирует зашифрованные файлы агентов, политики доступа,
+              аудит, безопасность и автоматические сценарии.
             </p>
           </div>
 

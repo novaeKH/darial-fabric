@@ -47,11 +47,13 @@ select {
   height: 48px;
   border-radius: 16px;
   background: linear-gradient(135deg, #7c3aed, #06b6d4);
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   font-weight: 800;
   letter-spacing: -0.04em;
+  position: relative;
+  overflow: hidden;
 }
 
 .brand-title {
@@ -1421,4 +1423,10 @@ details summary {
   .realtime-indicator span:not(.realtime-dot) {
     max-width: none;
   }
+}
+
+
+.brand-logo svg {
+  position: relative;
+  z-index: 1;
 }
