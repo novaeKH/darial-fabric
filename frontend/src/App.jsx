@@ -518,12 +518,12 @@ export default function App() {
     <div className="app-shell">
       <aside className="sidebar">
         <div className="brand">
-          <div className="brand-logo" aria-label="Ancile logo">
+          <div className="brand-logo" aria-label="Darial logo">
             <Shield size={30} strokeWidth={2.2} />
           </div>
           <div>
-            <div className="brand-title">Ancile</div>
-            <div className="brand-subtitle">Защитный слой для AI-агентов</div>
+            <div className="brand-title">Darial</div>
+            <div className="brand-subtitle">Контролируемый проход для AI-агентов</div>
           </div>
         </div>
 
@@ -555,7 +555,7 @@ export default function App() {
           <div>
             <h1>{tabs.find((t) => t.id === activeTab)?.label}</h1>
             <p>
-              Ancile контролирует зашифрованные файлы агентов, политики доступа,
+              Darial контролирует зашифрованные файлы агентов, политики доступа,
               аудит, безопасность и автоматические сценарии.
             </p>
           </div>
