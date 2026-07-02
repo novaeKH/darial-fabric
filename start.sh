@@ -8,4 +8,5 @@ docker compose \
   -f docker-compose.kafka-consumer.yml \
   -f docker-compose.kafka-outbox.yml \
   -f docker-compose.kafka-bridge.yml \
+  -f docker-compose.kafka-dlq.yml \
   up -d

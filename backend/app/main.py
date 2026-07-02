@@ -21,6 +21,7 @@ from app.api.routes import router
 from app.core.config import settings
 from app.core.database import Base, engine
 from app.api.kafka_routes import router as kafka_router
+from app.api.kafka_dlq_routes import router as kafka_dlq_router
 
 
 @asynccontextmanager
@@ -44,6 +45,7 @@ app = FastAPI(
     ),
     lifespan=lifespan,
 )
+app.include_router(kafka_dlq_router)
 
 app.middleware("http")(rbac_middleware)
 
