@@ -1,9 +1,22 @@
+from app.api.rbac_session_routes import router as rbac_session_router
+from app.rbac_middleware import rbac_middleware
+from app.api.rbac_routes import router as rbac_router
+from app.api.reports_routes import router as reports_router
+from app.api.ingestion_operations_routes import router as ingestion_operations_router
+from app.api.ingestion_processor_routes import router as ingestion_processor_router
+from app.api.ingestion_routes import router as ingestion_router
+from app.api.enterprise_policies_routes import router as enterprise_policies_router
+from app.api.policies_routes import router as policies_router
+from app.api.governance_routes import router as governance_router
+from app.api.finops_routes import router as finops_router
+from app.api.control_center_routes import router as control_center_router
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app import models  # noqa: F401
+from app.api.observability_routes import router as observability_router
 from app.api.routes import router
 from app.core.config import settings
 from app.core.database import Base, engine
@@ -15,8 +28,8 @@ async def lifespan(app: FastAPI):
     Application startup/shutdown lifecycle.
 
     MVP note:
-    - create_all is acceptable for the educational/demo version.
-    - In production this should be replaced with Alembic migrations.
+    - create_all keeps the current educational/demo setup working;
+    - Alembic migrations should replace it before production deployment.
     """
     Base.metadata.create_all(bind=engine)
     yield
@@ -25,9 +38,13 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
-    description="Secure control plane for enterprise AI agents",
+    description=(
+        "Darial — enterprise AI observability, FinOps and governance control plane"
+    ),
     lifespan=lifespan,
 )
+
+app.middleware("http")(rbac_middleware)
 
 app.add_middleware(
     CORSMiddleware,
@@ -38,13 +55,27 @@ app.add_middleware(
 )
 
 app.include_router(router, prefix="/api")
+app.include_router(observability_router, prefix="/api")
+app.include_router(control_center_router, prefix="/api")
+app.include_router(finops_router, prefix="/api")
+app.include_router(governance_router, prefix="/api")
+app.include_router(policies_router, prefix="/api")
+app.include_router(enterprise_policies_router, prefix="/api")
+app.include_router(ingestion_router, prefix="/api")
+app.include_router(ingestion_processor_router, prefix="/api")
+app.include_router(ingestion_operations_router, prefix="/api")
+app.include_router(reports_router, prefix="/api")
+app.include_router(rbac_router, prefix="/api")
+app.include_router(rbac_session_router, prefix="/api")
 
 
 @app.get("/")
 def root():
     return {
-        "message": "Secure Workspace Fabric backend is running",
+        "message": "Darial AI Control Center backend is running",
         "version": settings.APP_VERSION,
+        "product": "AI Observability, FinOps and Governance",
         "docs_url": "/docs",
         "api_health_url": "/api/health",
+        "observability_summary_url": "/api/observability/dashboard/summary",
     }

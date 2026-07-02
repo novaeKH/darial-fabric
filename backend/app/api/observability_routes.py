@@ -1,0 +1,210 @@
+from datetime import datetime
+
+from fastapi import APIRouter, Depends, Query
+from sqlalchemy.orm import Session
+
+from app.core.auth import AuthenticatedAgent, require_agent_api_key
+from app.core.database import get_db
+from app.models.observability import AIProduct, AgentDeployment, AgentRun, ModelEndpoint
+from app.schemas.observability import (
+    AIProductCreate,
+    AIProductRead,
+    AgentDeploymentCreate,
+    AgentDeploymentRead,
+    AgentRunRead,
+    BusinessOutcomeCreate,
+    BusinessOutcomeRead,
+    DashboardSummary,
+    LLMCallCreate,
+    LLMCallRead,
+    ModelEndpointCreate,
+    ModelEndpointRead,
+    RunFinishRequest,
+    RunStartRequest,
+    ToolCallCreate,
+    ToolCallRead,
+)
+from app.services.observability_service import (
+    create_deployment,
+    create_model_endpoint,
+    create_product,
+    finish_run,
+    get_dashboard_summary,
+    record_llm_call,
+    record_outcome,
+    record_tool_call,
+    start_run,
+)
+
+router = APIRouter(tags=["AI Observability"])
+
+
+@router.post("/ai-products", response_model=AIProductRead)
+def register_ai_product(
+    payload: AIProductCreate,
+    db: Session = Depends(get_db),
+):
+    return create_product(db, payload)
+
+
+@router.get("/ai-products", response_model=list[AIProductRead])
+def list_ai_products(
+    team_id: str | None = None,
+    db: Session = Depends(get_db),
+):
+    query = db.query(AIProduct)
+    if team_id:
+        query = query.filter(AIProduct.owner_team_id == team_id)
+    return query.order_by(AIProduct.created_at.desc()).all()
+
+
+@router.post("/agent-deployments", response_model=AgentDeploymentRead)
+def register_agent_deployment(
+    payload: AgentDeploymentCreate,
+    db: Session = Depends(get_db),
+):
+    return create_deployment(db, payload)
+
+
+@router.get("/agent-deployments", response_model=list[AgentDeploymentRead])
+def list_agent_deployments(
+    product_id: str | None = None,
+    agent_id: str | None = None,
+    environment: str | None = None,
+    db: Session = Depends(get_db),
+):
+    query = db.query(AgentDeployment)
+    if product_id:
+        query = query.filter(AgentDeployment.product_id == product_id)
+    if agent_id:
+        query = query.filter(AgentDeployment.agent_id == agent_id)
+    if environment:
+        query = query.filter(AgentDeployment.environment == environment)
+    return query.order_by(AgentDeployment.deployed_at.desc()).all()
+
+
+@router.post("/model-endpoints", response_model=ModelEndpointRead)
+def register_model_endpoint(
+    payload: ModelEndpointCreate,
+    db: Session = Depends(get_db),
+):
+    return create_model_endpoint(db, payload)
+
+
+@router.get("/model-endpoints", response_model=list[ModelEndpointRead])
+def list_model_endpoints(
+    active_only: bool = True,
+    db: Session = Depends(get_db),
+):
+    query = db.query(ModelEndpoint)
+    if active_only:
+        query = query.filter(ModelEndpoint.is_active.is_(True))
+    return query.order_by(ModelEndpoint.created_at.desc()).all()
+
+
+@router.post("/telemetry/runs/start", response_model=AgentRunRead)
+def telemetry_start_run(
+    payload: RunStartRequest,
+    current_agent: AuthenticatedAgent = Depends(require_agent_api_key),
+    db: Session = Depends(get_db),
+):
+    return start_run(
+        db,
+        authenticated_agent_id=current_agent.id,
+        payload=payload,
+    )
+
+
+@router.patch("/telemetry/runs/{run_id}/finish", response_model=AgentRunRead)
+def telemetry_finish_run(
+    run_id: str,
+    payload: RunFinishRequest,
+    current_agent: AuthenticatedAgent = Depends(require_agent_api_key),
+    db: Session = Depends(get_db),
+):
+    return finish_run(
+        db,
+        run_id=run_id,
+        authenticated_agent_id=current_agent.id,
+        payload=payload,
+    )
+
+
+@router.post("/telemetry/runs/{run_id}/llm-calls", response_model=LLMCallRead)
+def telemetry_record_llm_call(
+    run_id: str,
+    payload: LLMCallCreate,
+    current_agent: AuthenticatedAgent = Depends(require_agent_api_key),
+    db: Session = Depends(get_db),
+):
+    return record_llm_call(
+        db,
+        run_id=run_id,
+        authenticated_agent_id=current_agent.id,
+        payload=payload,
+    )
+
+
+@router.post("/telemetry/runs/{run_id}/tool-calls", response_model=ToolCallRead)
+def telemetry_record_tool_call(
+    run_id: str,
+    payload: ToolCallCreate,
+    current_agent: AuthenticatedAgent = Depends(require_agent_api_key),
+    db: Session = Depends(get_db),
+):
+    return record_tool_call(
+        db,
+        run_id=run_id,
+        authenticated_agent_id=current_agent.id,
+        payload=payload,
+    )
+
+
+@router.post("/telemetry/runs/{run_id}/outcomes", response_model=BusinessOutcomeRead)
+def telemetry_record_outcome(
+    run_id: str,
+    payload: BusinessOutcomeCreate,
+    current_agent: AuthenticatedAgent = Depends(require_agent_api_key),
+    db: Session = Depends(get_db),
+):
+    return record_outcome(
+        db,
+        run_id=run_id,
+        authenticated_agent_id=current_agent.id,
+        payload=payload,
+    )
+
+
+@router.get("/observability/runs", response_model=list[AgentRunRead])
+def list_agent_runs(
+    product_id: str | None = None,
+    agent_id: str | None = None,
+    status: str | None = None,
+    limit: int = Query(default=100, ge=1, le=500),
+    db: Session = Depends(get_db),
+):
+    query = db.query(AgentRun)
+    if product_id:
+        query = query.filter(AgentRun.product_id == product_id)
+    if agent_id:
+        query = query.filter(AgentRun.agent_id == agent_id)
+    if status:
+        query = query.filter(AgentRun.status == status)
+    return query.order_by(AgentRun.created_at.desc()).limit(limit).all()
+
+
+@router.get("/observability/dashboard/summary", response_model=DashboardSummary)
+def observability_dashboard_summary(
+    date_from: datetime | None = None,
+    date_to: datetime | None = None,
+    product_id: str | None = None,
+    agent_id: str | None = None,
+    db: Session = Depends(get_db),
+):
+    return get_dashboard_summary(
+        db,
+        date_from=date_from,
+        date_to=date_to,
+        product_id=product_id,
+        agent_id=agent_id,
+    )

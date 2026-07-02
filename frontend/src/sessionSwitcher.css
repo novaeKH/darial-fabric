@@ -1,0 +1,64 @@
+.session-switcher{position:relative;padding:12px}.session-current{display:grid;width:100%;grid-template-columns:auto 1fr auto;align-items:center;gap:9px;padding:9px;border:1px solid #293348;border-radius:12px;background:#161e2d;color:#fff;text-align:left;cursor:pointer}.session-avatar{display:grid;width:32px;height:32px;place-items:center;border-radius:9px;background:#29365a;color:#9c8fff}.session-current strong,.session-current span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.session-current strong{font-size:10px}.session-current span{margin-top:3px;color:#8e98ad;font-size:8px}.session-menu{position:absolute;z-index:1800;bottom:68px;left:12px;width:270px;overflow:hidden;border:1px solid #343d50;border-radius:13px;background:#171c28;box-shadow:0 20px 60px rgba(0,0,0,.35)}.session-menu>button{display:flex;width:100%;align-items:center;justify-content:space-between;gap:9px;padding:10px 12px;border:0;border-bottom:1px solid #252d3c;background:transparent;color:#fff;text-align:left;cursor:pointer}.session-menu>button:hover{background:#212838}.session-menu>button strong,.session-menu>button span{display:block}.session-menu>button strong{font-size:10px}.session-menu>button span{margin-top:3px;color:#8e98ad;font-size:8px}.session-menu .session-logout{justify-content:flex-start;color:#ff9ba6}
+
+/* Session menu fix */
+.session-switcher {
+  position: relative;
+  z-index: 2000;
+}
+
+.session-menu {
+  position: fixed !important;
+  left: 315px !important;
+  bottom: 24px !important;
+  width: 290px !important;
+  max-height: 420px !important;
+  overflow-y: auto !important;
+  z-index: 5000 !important;
+}
+
+@media (max-width: 850px) {
+  .session-menu {
+    left: 20px !important;
+    right: 20px !important;
+    bottom: 85px !important;
+    width: auto !important;
+  }
+}
+
+/* Fix: меню выбора пользователя поверх интерфейса */
+.session-switcher {
+  position: relative !important;
+  z-index: 10000 !important;
+  overflow: visible !important;
+}
+
+.session-current {
+  position: relative !important;
+  z-index: 10001 !important;
+}
+
+.session-menu {
+  display: block !important;
+  position: fixed !important;
+  left: 310px !important;
+  bottom: 22px !important;
+  width: 290px !important;
+  max-height: 430px !important;
+  overflow-y: auto !important;
+
+  z-index: 99999 !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+
+  border: 1px solid #343d50 !important;
+  border-radius: 14px !important;
+  background: #171c28 !important;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55) !important;
+}
+
+/* Родитель не должен обрезать выпадающее меню */
+.sidebar,
+.sidebar-footer {
+  overflow: visible !important;
+}

@@ -12,3 +12,38 @@ from app.models.base import (
     FileLineage,
     FlowRun,
 )
+from app.models.observability import (
+    AIProduct,
+    AgentDeployment,
+    ModelEndpoint,
+    AgentRun,
+    LLMCall,
+    ToolCall,
+    BusinessOutcome,
+    Budget,
+    PolicyViolation,
+)
+
+__all__ = [
+    "User",
+    "Team",
+    "Agent",
+    "AgentToolPermission",
+    "Workspace",
+    "Folder",
+    "File",
+    "Permission",
+    "AuditLog",
+    "SecurityFinding",
+    "FileLineage",
+    "FlowRun",
+    "AIProduct",
+    "AgentDeployment",
+    "ModelEndpoint",
+    "AgentRun",
+    "LLMCall",
+    "ToolCall",
+    "BusinessOutcome",
+    "Budget",
+    "PolicyViolation",
+]

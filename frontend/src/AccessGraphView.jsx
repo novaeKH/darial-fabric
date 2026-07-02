@@ -727,13 +727,6 @@ function AccessGraphView({ graph, openPassport }) {
           </button>
         </div>
 
-        <div className="graph-help">
-          <span><strong>Совет для демо:</strong></span>
-          <span>Начните только со структуры.</span>
-          <span>Потом включите доступы, чтобы показать кому и к каким файлам выданы права.</span>
-          <span>Затем включите происхождение, чтобы показать производные артефакты.</span>
-        </div>
-
         <div className="react-flow-wrapper">
           {!hasGraphData || nodes.length === 0 ? (
             <div className="empty-state">

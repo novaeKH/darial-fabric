@@ -1,4 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import SessionSwitcher from "./SessionSwitcher";
+import { getCachedPermissions } from "./sessionApi";
+import { canAccessTab } from "./tabPermissions";
 import {
   Activity,
   Bot,
@@ -40,21 +43,29 @@ import {
 } from "./api";
 
 import AccessGraphView from "./AccessGraphView";
+import ObservabilityDashboard from "./ObservabilityDashboard";
+import { AiProductsView, AiAgentsView, AgentRunsView } from "./ControlCenterViews";
+import BudgetView from "./BudgetView";
+import ViolationsView from "./ViolationsView";
+import PoliciesView from "./PoliciesView";
+import EnterprisePoliciesView from "./EnterprisePoliciesView";
+import IntegrationsView from "./IntegrationsView";
+import ReportsView from "./ReportsView";
+import AccessView from "./AccessView";
 
 const tabs = [
-  { id: "dashboard", label: "Панель", icon: Activity },
-  { id: "agents", label: "Агенты", icon: Bot },
-  { id: "files", label: "Файлы", icon: FileText },
-  { id: "upload", label: "Загрузка", icon: FileText },
-  { id: "passport", label: "Паспорт файла", icon: Lock },
-  { id: "permissions", label: "Доступы", icon: Shield },
-  { id: "graph", label: "Граф доступа", icon: GitBranch },
-  { id: "policy", label: "Симулятор доступа", icon: Shield },
-  { id: "security", label: "Безопасность", icon: Shield },
-  { id: "flows", label: "Сценарии", icon: GitBranch },
-  { id: "audit", label: "Аудит", icon: ScrollText },
-  { id: "compliance", label: "Отчёт", icon: ScrollText },
-  { id: "demo", label: "Демо", icon: Play },
+  { id: "economics", label: "AI-экономика", icon: Activity },
+  { id: "ai-products", label: "AI-продукты", icon: Activity },
+  { id: "ai-agents", label: "Агенты", icon: Activity },
+  { id: "agent-runs", label: "Запуски", icon: Activity },
+  { id: "budgets", label: "Бюджеты", icon: Activity },
+  { id: "violations", label: "Нарушения", icon: Activity },
+  { id: "policies", label: "Политики", icon: Activity },
+  { id: "enterprise-policies", label: "Корп. политики", icon: Activity },
+  { id: "integrations", label: "Интеграции", icon: Activity },
+  { id: "reports", label: "Отчёты", icon: Activity },
+  { id: "access", label: "Доступы", icon: Activity },
+  { id: "audit", label: "Аудит", icon: Activity },
 ];
 
 const statusLabels = {
@@ -314,7 +325,7 @@ function tRealtimeEvent(type) {
 }
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState("dashboard");
+  const [activeTab, setActiveTab] = useState("economics");
 
   const [loading, setLoading] = useState(false);
   const [lastAction, setLastAction] = useState(null);
@@ -523,7 +534,7 @@ export default function App() {
           </div>
           <div>
             <div className="brand-title">Darial</div>
-            <div className="brand-subtitle">Контролируемый проход для AI-агентов</div>
+            <div className="brand-subtitle">Центр управления корпоративными AI-системами</div>
           </div>
         </div>
 
@@ -548,15 +559,15 @@ export default function App() {
             {checklist?.ready_for_demo ? "Демо готово" : "Нужны данные"}
           </Badge>
         </div>
-      </aside>
+        <SessionSwitcher onPermissionsChange={setPermissions} />
+</aside>
 
       <main className="main">
         <header className="topbar">
           <div>
             <h1>{tabs.find((t) => t.id === activeTab)?.label}</h1>
             <p>
-              Darial контролирует зашифрованные файлы агентов, политики доступа,
-              аудит, безопасность и автоматические сценарии.
+              Darial объединяет наблюдаемость, затраты, эффективность и управление корпоративными AI-системами.
             </p>
           </div>
 
@@ -589,7 +600,18 @@ export default function App() {
 
         {loading && <div className="loading-line">Загрузка...</div>}
 
-        {activeTab === "dashboard" && (
+        {activeTab === "economics" && <ObservabilityDashboard />}
+        {activeTab === "ai-products" && <AiProductsView />}
+        {activeTab === "ai-agents" && <AiAgentsView />}
+        {activeTab === "agent-runs" && <AgentRunsView />}
+        {activeTab === "budgets" && <BudgetView />}
+        {activeTab === "violations" && <ViolationsView />}
+        {activeTab === "policies" && <PoliciesView />}
+        {activeTab === "enterprise-policies" && <EnterprisePoliciesView />}
+        {activeTab === "integrations" && <IntegrationsView />}
+        {activeTab === "reports" && <ReportsView />}
+        {activeTab === "access" && <AccessView />}
+ {activeTab === "dashboard" && (
           <DashboardView
             counts={counts}
             agents={agents}

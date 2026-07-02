@@ -107,6 +107,25 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
+
+  ingestion-worker:
+    build:
+      context: ./backend
+    container_name: swf-ingestion-worker
+    command: python -m app.ingestion_worker
+    env_file:
+      - ./backend/.env
+    environment:
+      INGESTION_POLL_INTERVAL_SECONDS: 5
+      INGESTION_BATCH_SIZE: 200
+      INGESTION_MAX_RETRIES: 3
+    depends_on:
+      postgres:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
 volumes:
   swf_postgres_data:
   swf_minio_data:
