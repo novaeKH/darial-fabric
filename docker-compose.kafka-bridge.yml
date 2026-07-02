@@ -1,0 +1,6 @@
+services:
+  telemetry-consumer:
+    environment:
+      KAFKA_CONSUMER_GROUP: darial-telemetry-bridge-v1
+      KAFKA_AUTO_OFFSET_RESET: latest
+      KAFKA_BRIDGE_TO_INGESTION: "true"

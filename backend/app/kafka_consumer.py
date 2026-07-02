@@ -30,6 +30,11 @@ ALLOWED_EVENT_TYPES = {
     "business_outcome",
 }
 
+BRIDGE_ENABLED = (
+    os.getenv("KAFKA_BRIDGE_TO_INGESTION", "true").lower()
+    in {"1", "true", "yes", "on"}
+)
+
 
 def stop_handler(signum, frame):
     global RUNNING
@@ -55,7 +60,7 @@ def dlq_topic() -> str:
     )
 
 
-def ensure_table() -> None:
+def ensure_tables() -> None:
     with SessionLocal() as db:
         db.execute(
             text(
@@ -77,6 +82,24 @@ def ensure_table() -> None:
                 """
             )
         )
+
+        db.execute(
+            text(
+                """
+                ALTER TABLE kafka_consumed_events
+                ADD COLUMN IF NOT EXISTS ingestion_event_id VARCHAR(64)
+                """
+            )
+        )
+        db.execute(
+            text(
+                """
+                ALTER TABLE kafka_consumed_events
+                ADD COLUMN IF NOT EXISTS bridge_status VARCHAR(32)
+                """
+            )
+        )
+
         db.execute(
             text(
                 """
@@ -86,6 +109,7 @@ def ensure_table() -> None:
                 """
             )
         )
+
         db.commit()
 
 
@@ -94,7 +118,7 @@ def consumer_config() -> dict:
         "bootstrap.servers": bootstrap_servers(),
         "group.id": os.getenv(
             "KAFKA_CONSUMER_GROUP",
-            "darial-telemetry-shadow-v1",
+            "darial-telemetry-bridge-v1",
         ),
         "auto.offset.reset": os.getenv(
             "KAFKA_AUTO_OFFSET_RESET",
@@ -110,7 +134,7 @@ def consumer_config() -> dict:
 def producer_config() -> dict:
     return {
         "bootstrap.servers": bootstrap_servers(),
-        "client.id": "darial-kafka-shadow-consumer",
+        "client.id": "darial-kafka-bridge-consumer",
         "acks": "all",
         "enable.idempotence": True,
     }
@@ -179,6 +203,165 @@ def normalize_event(message) -> dict:
     return body
 
 
+def ensure_kafka_source(db, product_id: str | None) -> str:
+    source_id = db.execute(
+        text(
+            """
+            SELECT id
+            FROM ingestion_sources
+            WHERE name='Kafka Telemetry Bridge'
+            ORDER BY created_at
+            LIMIT 1
+            """
+        )
+    ).scalar()
+
+    if source_id:
+        return str(source_id)
+
+    source_id = str(uuid4())
+
+    db.execute(
+        text(
+            """
+            INSERT INTO ingestion_sources (
+                id,
+                name,
+                source_type,
+                product_id,
+                environment,
+                status,
+                metadata_json,
+                created_at
+            )
+            VALUES (
+                :id,
+                'Kafka Telemetry Bridge',
+                'kafka',
+                :product_id,
+                'production',
+                'active',
+                CAST(:metadata_json AS JSONB),
+                NOW()
+            )
+            """
+        ),
+        {
+            "id": source_id,
+            "product_id": product_id,
+            "metadata_json": json.dumps(
+                {
+                    "bootstrap_servers": bootstrap_servers(),
+                    "topic": telemetry_topic(),
+                    "managed_by": "darial",
+                }
+            ),
+        },
+    )
+
+    return source_id
+
+
+def bridge_to_ingestion(db, body: dict) -> tuple[str, str]:
+    event_id = str(body["event_id"])
+
+    existing = db.execute(
+        text(
+            """
+            SELECT id, status
+            FROM ingestion_events
+            WHERE event_id=:event_id
+            """
+        ),
+        {"event_id": event_id},
+    ).mappings().first()
+
+    if existing:
+        return str(existing["id"]), "already_exists"
+
+    product_id = body.get("product_id")
+    source_id = body.get("source_id")
+
+    if source_id:
+        source_exists = db.execute(
+            text(
+                """
+                SELECT id
+                FROM ingestion_sources
+                WHERE id=:source_id
+                """
+            ),
+            {"source_id": str(source_id)},
+        ).scalar()
+
+        if not source_exists:
+            source_id = None
+
+    if not source_id:
+        source_id = ensure_kafka_source(
+            db,
+            str(product_id) if product_id else None,
+        )
+
+    ingestion_event_id = str(uuid4())
+
+    db.execute(
+        text(
+            """
+            INSERT INTO ingestion_events (
+                id,
+                source_id,
+                event_id,
+                event_type,
+                product_id,
+                agent_name,
+                trace_id,
+                payload_json,
+                received_at,
+                status,
+                retry_count
+            )
+            VALUES (
+                :id,
+                :source_id,
+                :event_id,
+                :event_type,
+                :product_id,
+                :agent_name,
+                :trace_id,
+                CAST(:payload_json AS JSONB),
+                NOW(),
+                'accepted',
+                0
+            )
+            """
+        ),
+        {
+            "id": ingestion_event_id,
+            "source_id": str(source_id),
+            "event_id": event_id,
+            "event_type": body["event_type"],
+            "product_id": (
+                str(product_id)
+                if product_id is not None
+                else None
+            ),
+            "agent_name": (
+                body.get("agent_name")
+                or body.get("payload", {}).get("agent_name")
+            ),
+            "trace_id": body.get("trace_id"),
+            "payload_json": json.dumps(
+                body["payload"],
+                ensure_ascii=False,
+                default=str,
+            ),
+        },
+    )
+
+    return ingestion_event_id, "created"
+
+
 def store_event(message, body: dict) -> str:
     with SessionLocal() as db:
         existing = db.execute(
@@ -195,6 +378,15 @@ def store_event(message, body: dict) -> str:
         if existing:
             return "duplicate"
 
+        ingestion_event_id = None
+        bridge_status = "disabled"
+
+        if BRIDGE_ENABLED:
+            ingestion_event_id, bridge_status = bridge_to_ingestion(
+                db,
+                body,
+            )
+
         db.execute(
             text(
                 """
@@ -208,6 +400,8 @@ def store_event(message, body: dict) -> str:
                     product_id,
                     payload_json,
                     status,
+                    ingestion_event_id,
+                    bridge_status,
                     consumed_at
                 )
                 VALUES (
@@ -220,6 +414,8 @@ def store_event(message, body: dict) -> str:
                     :product_id,
                     :payload_json,
                     'accepted',
+                    :ingestion_event_id,
+                    :bridge_status,
                     :consumed_at
                 )
                 """
@@ -237,24 +433,36 @@ def store_event(message, body: dict) -> str:
                     ensure_ascii=False,
                     default=str,
                 ),
+                "ingestion_event_id": ingestion_event_id,
+                "bridge_status": bridge_status,
                 "consumed_at": datetime.now(timezone.utc),
             },
         )
+
         db.commit()
+
+        if bridge_status == "created":
+            return "accepted_and_bridged"
+
+        if bridge_status == "already_exists":
+            return "accepted_existing_ingestion_event"
+
         return "accepted"
 
 
 def main() -> None:
-    ensure_table()
+    ensure_tables()
 
     consumer = Consumer(consumer_config())
     producer = Producer(producer_config())
 
     consumer.subscribe([telemetry_topic()])
     logger.info(
-        "Kafka shadow consumer started topic=%s group=%s",
+        "Kafka bridge consumer started "
+        "topic=%s group=%s bridge=%s",
         telemetry_topic(),
         consumer_config()["group.id"],
+        BRIDGE_ENABLED,
     )
 
     try:
@@ -319,7 +527,7 @@ def main() -> None:
     finally:
         consumer.close()
         producer.flush(5)
-        logger.info("Kafka shadow consumer stopped")
+        logger.info("Kafka bridge consumer stopped")
 
 
 if __name__ == "__main__":

@@ -32,6 +32,10 @@ def publish_test_event(body: KafkaTestEvent):
             "event_id": event_id,
             "event_type": body.event_type,
             "product_id": body.product_id,
+            "trace_id": (
+                body.payload.get("trace_id")
+                or f"trace-{uuid4()}"
+            ),
             "payload": body.payload,
             "source": "darial-stage14.2.2a",
             "occurred_at": datetime.now(timezone.utc).isoformat(),
