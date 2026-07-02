@@ -8,6 +8,19 @@ export const api = axios.create({
   timeout: 30000,
 });
 
+
+
+// Darial principal interceptor
+api.interceptors.request.use((config) => {
+  const principalId = localStorage.getItem("darial_principal_id");
+
+  if (principalId) {
+    config.headers = config.headers || {};
+    config.headers["X-Darial-Principal"] = principalId;
+  }
+
+  return config;
+});
 function unwrapData(response) {
   return response.data;
 }

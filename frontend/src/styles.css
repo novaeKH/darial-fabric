@@ -1430,3 +1430,114 @@ details summary {
   position: relative;
   z-index: 1;
 }
+
+/* Stage 14.2.3C — Kafka DLQ */
+.dlq-panel { display:flex; flex-direction:column; gap:18px; }
+.dlq-toolbar,.dlq-details-header,.dlq-actions,.dlq-filters {
+  display:flex; align-items:center;
+}
+.dlq-toolbar,.dlq-details-header { justify-content:space-between; gap:16px; }
+.dlq-toolbar h2,.dlq-details h3,.dlq-details h4 { margin:0; }
+.dlq-toolbar p { margin:6px 0 0; opacity:.65; }
+.dlq-filters { gap:8px; flex-wrap:wrap; }
+.dlq-filters button,.dlq-toolbar button,.dlq-actions button,.dlq-details-header button {
+  border:1px solid var(--border-color,#283142);
+  background:var(--surface-color,#151b26);
+  color:inherit; border-radius:9px; padding:8px 11px; cursor:pointer;
+}
+.dlq-filters button.active { border-color:#4d7cff; background:rgba(77,124,255,.14); }
+.dlq-layout { display:grid; grid-template-columns:minmax(0,1fr) 380px; gap:16px; min-height:500px; }
+.dlq-table-wrap,.dlq-details {
+  border:1px solid var(--border-color,#283142);
+  background:var(--surface-color,#101722);
+  border-radius:12px; overflow:hidden;
+}
+.dlq-table { width:100%; border-collapse:collapse; }
+.dlq-table th,.dlq-table td {
+  padding:13px 14px; border-bottom:1px solid var(--border-color,#283142);
+  text-align:left; vertical-align:top;
+}
+.dlq-table th { font-size:12px; opacity:.65; }
+.dlq-table tbody tr { cursor:pointer; }
+.dlq-table tbody tr:hover,.dlq-row-selected { background:rgba(77,124,255,.08); }
+.dlq-table small,.dlq-details small {
+  display:block; margin-top:4px; opacity:.65; word-break:break-all;
+}
+.dlq-status { display:inline-flex; padding:4px 8px; border-radius:999px; font-size:12px; }
+.dlq-status-pending { background:rgba(245,166,35,.15); color:#f5a623; }
+.dlq-status-replayed { background:rgba(77,124,255,.15); color:#78a0ff; }
+.dlq-status-resolved { background:rgba(46,204,113,.15); color:#47d889; }
+.dlq-actions { gap:7px; }
+.dlq-actions button:disabled { opacity:.45; cursor:not-allowed; }
+.dlq-details { padding:18px; overflow:auto; }
+.dlq-details dl {
+  display:grid; grid-template-columns:130px minmax(0,1fr);
+  gap:10px 12px; margin:22px 0;
+}
+.dlq-details dt { opacity:.65; }
+.dlq-details dd { margin:0; word-break:break-word; }
+.dlq-details pre {
+  margin:12px 0 0; padding:14px; background:#0a0f17;
+  border-radius:9px; overflow:auto; font-size:12px; line-height:1.55;
+}
+.dlq-error {
+  padding:12px 14px; border:1px solid rgba(255,86,86,.35);
+  background:rgba(255,86,86,.09); color:#ff8b8b; border-radius:9px;
+}
+.dlq-empty-details { opacity:.65; line-height:1.5; }
+@media (max-width:1100px) {
+  .dlq-layout { grid-template-columns:1fr; }
+}
+
+/* Kafka DLQ — исправление контраста */
+.dlq-table-wrap,
+.dlq-details {
+  color: #e8edf6;
+}
+
+.dlq-table th {
+  color: #8996aa;
+  opacity: 1;
+}
+
+.dlq-table td,
+.dlq-details dd,
+.dlq-details h3,
+.dlq-details h4 {
+  color: #dfe7f3;
+}
+
+.dlq-table strong {
+  color: #f6f8fc;
+}
+
+.dlq-table small,
+.dlq-details small,
+.dlq-details dt,
+.dlq-empty-details {
+  color: #8d99ac;
+  opacity: 1;
+}
+
+.dlq-filters button,
+.dlq-toolbar button,
+.dlq-actions button,
+.dlq-details-header button {
+  color: #eef3fb;
+}
+
+.dlq-filters button.active {
+  background: #edf3ff;
+  border-color: #5d7cff;
+  color: #142033;
+}
+
+.dlq-actions button {
+  background: #1c2636;
+  border-color: #354258;
+}
+
+.dlq-details pre {
+  color: #dbe5f4;
+}
+

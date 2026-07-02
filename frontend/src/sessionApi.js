@@ -48,3 +48,12 @@ export function setCachedPermissions(permissions) {
     JSON.stringify(permissions || [])
   );
 }
+
+export async function principalFetch(path, options = {}) {
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+
+  return fetch(`${BASE}${normalizedPath}`, {
+    ...options,
+    headers: principalHeaders(options.headers || {}),
+  });
+}

@@ -53,6 +53,8 @@ import IntegrationsView from "./IntegrationsView";
 import ReportsView from "./ReportsView";
 import AccessView from "./AccessView";
 
+import KafkaDlqPanel from "./components/KafkaDlqPanel";
+
 const tabs = [
   { id: "economics", label: "AI-экономика", icon: Activity },
   { id: "ai-products", label: "AI-продукты", icon: Activity },
@@ -64,6 +66,7 @@ const tabs = [
   { id: "enterprise-policies", label: "Корп. политики", icon: Activity },
   { id: "integrations", label: "Интеграции", icon: Activity },
   { id: "reports", label: "Отчёты", icon: Activity },
+  { id: "dlq", label: "Kafka DLQ", icon: Activity },
   { id: "access", label: "Доступы", icon: Activity },
   { id: "audit", label: "Аудит", icon: Activity },
 ];
@@ -626,6 +629,7 @@ export default function App() {
         {activeTab === "enterprise-policies" && <EnterprisePoliciesView />}
         {activeTab === "integrations" && <IntegrationsView />}
         {activeTab === "reports" && <ReportsView />}
+      {activeTab === "dlq" && <KafkaDlqPanel />}
         {activeTab === "access" && <AccessView />}
  {activeTab === "dashboard" && (
           <DashboardView

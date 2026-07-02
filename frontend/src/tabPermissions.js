@@ -9,6 +9,7 @@ export const TAB_PERMISSIONS = {
   "enterprise-policies": ["policies.manage", "platform.admin"],
   integrations: ["integrations.manage", "platform.admin"],
   reports: ["reports.read", "platform.admin"],
+  dlq: ["violations.read", "integrations.manage", "platform.admin"],
   access: ["rbac.manage", "platform.admin"],
   audit: ["audit.read", "platform.admin"],
 };
