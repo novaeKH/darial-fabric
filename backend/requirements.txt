@@ -34,3 +34,4 @@ websockets==15.0.1
 PyYAML==6.0.2
 email-validator==2.2.0
 clickhouse-connect==0.8.18
+confluent-kafka==2.6.1

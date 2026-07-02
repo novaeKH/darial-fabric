@@ -1,0 +1,22 @@
+services:
+  telemetry-consumer:
+    build:
+      context: ./backend
+    container_name: darial-telemetry-consumer
+    restart: unless-stopped
+    command: python -m app.kafka_consumer
+    env_file:
+      - ./backend/.env
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: redpanda:9092
+      KAFKA_TELEMETRY_TOPIC: darial.telemetry.events
+      KAFKA_DLQ_TOPIC: darial.telemetry.dlq
+      KAFKA_CONSUMER_GROUP: darial-telemetry-shadow-v1
+      KAFKA_AUTO_OFFSET_RESET: earliest
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redpanda:
+        condition: service_healthy
+    networks:
+      - default

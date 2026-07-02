@@ -20,6 +20,7 @@ from app.api.observability_routes import router as observability_router
 from app.api.routes import router
 from app.core.config import settings
 from app.core.database import Base, engine
+from app.api.kafka_routes import router as kafka_router
 
 
 @asynccontextmanager
@@ -67,6 +68,7 @@ app.include_router(ingestion_operations_router, prefix="/api")
 app.include_router(reports_router, prefix="/api")
 app.include_router(rbac_router, prefix="/api")
 app.include_router(rbac_session_router, prefix="/api")
+app.include_router(kafka_router, prefix="/api")
 
 
 @app.get("/")
