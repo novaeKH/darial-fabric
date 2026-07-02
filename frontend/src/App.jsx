@@ -326,6 +326,22 @@ function tRealtimeEvent(type) {
 
 export default function App() {
   const [activeTab, setActiveTab] = useState("economics");
+  const [rbacPermissions, setRbacPermissions] = useState(getCachedPermissions());
+
+  const allowedTabs = tabs.filter((tab) =>
+    canAccessTab(tab.id, rbacPermissions)
+  );
+
+  useEffect(() => {
+    if (
+      allowedTabs.length > 0 &&
+      !allowedTabs.some((tab) => tab.id === activeTab)
+    ) {
+      setActiveTab(allowedTabs[0].id);
+    }
+  }, [rbacPermissions, activeTab]);
+
+
 
   const [loading, setLoading] = useState(false);
   const [lastAction, setLastAction] = useState(null);
@@ -539,7 +555,7 @@ export default function App() {
         </div>
 
         <nav className="nav">
-          {tabs.map((tab) => {
+          {allowedTabs.map((tab) => {
             const Icon = tab.icon;
             return (
               <button
@@ -559,7 +575,7 @@ export default function App() {
             {checklist?.ready_for_demo ? "Демо готово" : "Нужны данные"}
           </Badge>
         </div>
-        <SessionSwitcher onPermissionsChange={setPermissions} />
+        <SessionSwitcher onPermissionsChange={setRbacPermissions} />
 </aside>
 
       <main className="main">
