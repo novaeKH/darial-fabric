@@ -17,6 +17,8 @@ from app.models.observability import (
     PolicyViolation,
     ToolCall,
 )
+from fastapi import Request
+from app.security.product_scope import ensure_product_access, get_request_product_scope
 
 router = APIRouter(tags=["AI Control Center"])
 
@@ -125,10 +127,17 @@ def get_agents_summary(db: Session = Depends(get_db)):
 
 
 @router.get("/observability/runs/{run_id}/details")
-def get_run_details(run_id: str, db: Session = Depends(get_db)):
+def get_run_details(
+    run_id: str,
+    request: Request,
+    db: Session = Depends(get_db),
+):
     run = db.query(AgentRun).filter(AgentRun.id == run_id).first()
     if not run:
         raise HTTPException(status_code=404, detail="Run not found")
+
+    scope = get_request_product_scope(request, db)
+    ensure_product_access(scope, str(run.product_id))
 
     product = db.query(AIProduct).filter(AIProduct.id == run.product_id).first()
     agent = db.query(Agent).filter(Agent.id == run.agent_id).first()

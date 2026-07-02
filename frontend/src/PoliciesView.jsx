@@ -21,6 +21,7 @@ import {
 } from "./policiesApi";
 import "./policiesView.css";
 
+import { hasPermission, permissionTitle } from "./rbacPermissions";
 const RULE_LABELS = {
   max_run_cost: "Стоимость run",
   max_latency_ms: "Latency",
@@ -174,7 +175,7 @@ function PolicyEditor({ onClose, onSaved }) {
         )}
 
         {error && <div className="pol-error">{error}</div>}
-        <button className="pol-save" type="button" onClick={save} disabled={saving}>
+        <button title={permissionTitle("policies.manage")} className="pol-save" type="button" onClick={save} disabled={(saving) || !hasPermission("policies.manage")}>
           <Save size={16} />{saving ? "Сохранение…" : "Создать политику"}
         </button>
       </div>
@@ -248,12 +249,16 @@ export default function PoliciesView() {
           </p>
         </div>
         <div className="pol-actions">
-          <button type="button" onClick={evaluate} disabled={evaluating}>
-            <Activity size={16} />{evaluating ? "Проверка…" : "Проверить runs"}
-          </button>
-          <button type="button" onClick={() => setEditorOpen(true)}>
-            <Plus size={16} />Создать
-          </button>
+          {hasPermission("policies.manage") && (
+            <button type="button" onClick={evaluate} disabled={evaluating}>
+              <Activity size={16} />{evaluating ? "Проверка…" : "Проверить runs"}
+            </button>
+          )}
+          {hasPermission("policies.manage") && (
+            <button type="button" onClick={() => setEditorOpen(true)}>
+              <Plus size={16} />Создать
+            </button>
+          )}
           <button type="button" onClick={load} disabled={loading}>
             <RefreshCcw size={16} />Обновить
           </button>
@@ -278,9 +283,15 @@ export default function PoliciesView() {
                 <span>{policy.code}</span>
                 <h3>{policy.name}</h3>
               </div>
-              <button className="pol-toggle" type="button" onClick={() => toggle(policy)}>
-                {policy.is_enabled ? <ToggleRight size={32} /> : <ToggleLeft size={32} />}
-              </button>
+              {hasPermission("policies.manage") ? (
+                <button className="pol-toggle" type="button" onClick={() => toggle(policy)}>
+                  {policy.is_enabled ? <ToggleRight size={32} /> : <ToggleLeft size={32} />}
+                </button>
+              ) : (
+                <span className="pol-readonly-state">
+                  {policy.is_enabled ? "Включена" : "Отключена"}
+                </span>
+              )}
             </div>
 
             <p>{policy.description || "Описание отсутствует."}</p>
@@ -307,7 +318,9 @@ export default function PoliciesView() {
       </div>
 
       {!loading && !items.length && <div className="pol-empty">Политики пока не созданы.</div>}
-      {editorOpen && <PolicyEditor onClose={() => setEditorOpen(false)} onSaved={load} />}
+      {editorOpen && hasPermission("policies.manage") && (
+        <PolicyEditor onClose={() => setEditorOpen(false)} onSaved={load} />
+      )}
     </section>
   );
 }

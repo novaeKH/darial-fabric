@@ -17,6 +17,7 @@ import {
 } from "./budgetApi";
 import "./budgetView.css";
 
+import { hasPermission, permissionTitle } from "./rbacPermissions";
 const money = new Intl.NumberFormat("ru-RU", {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
@@ -99,7 +100,7 @@ function BudgetEditor({ product, onClose, onSaved }) {
           <input type="number" min="10" max="100" step="5" value={threshold} onChange={(e) => setThreshold(e.target.value)} />
         </label>
         {error && <div className="budget-error">{error}</div>}
-        <button className="budget-save" type="button" onClick={save} disabled={saving}>
+        <button title={permissionTitle("budgets.manage")} className="budget-save" type="button" onClick={save} disabled={(saving) || !hasPermission("budgets.manage")}>
           <Save size={16} />
           {saving ? "Сохранение…" : "Сохранить"}
         </button>
@@ -243,10 +244,12 @@ export default function BudgetView() {
 
               <div className="budget-card-footer">
                 <span>{product.runs} запусков · потери {formatMoney(product.failed_cost)}</span>
-                <button type="button" onClick={() => setEditing(product)}>
-                  <Pencil size={14} />
-                  Настроить
-                </button>
+                {hasPermission("budgets.manage") && (
+                  <button type="button" onClick={() => setEditing(product)}>
+                    <Pencil size={14} />
+                    Настроить
+                  </button>
+                )}
               </div>
             </article>
           );
@@ -254,7 +257,13 @@ export default function BudgetView() {
       </div>
 
       {!loading && !rows.length && <div className="budget-empty">Бюджеты пока не настроены.</div>}
-      {editing && <BudgetEditor product={editing} onClose={() => setEditing(null)} onSaved={load} />}
+      {editing && hasPermission("budgets.manage") && (
+        <BudgetEditor
+          product={editing}
+          onClose={() => setEditing(null)}
+          onSaved={load}
+        />
+      )}
     </section>
   );
 }

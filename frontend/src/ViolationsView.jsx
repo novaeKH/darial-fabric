@@ -15,6 +15,7 @@ import {
 import RunViolationDrawer from "./RunViolationDrawer";
 import "./violationsView.css";
 
+import { hasPermission, permissionTitle } from "./rbacPermissions";
 function formatDate(value) {
   if (!value) return "—";
   const date = new Date(value);
@@ -222,10 +223,10 @@ export default function ViolationsView() {
                     )}
 
                     {item.status !== "acknowledged" && item.status !== "resolved" && (
-                      <button
+                      <button title={permissionTitle("violations.manage")}
                         type="button"
                         className="viol-secondary"
-                        disabled={workingId === item.id}
+                        disabled={(workingId === item.id) || !hasPermission("violations.manage")}
                         onClick={() => changeStatus(item.id, "acknowledged")}
                       >
                         Принять
@@ -233,10 +234,10 @@ export default function ViolationsView() {
                     )}
 
                     {item.status !== "resolved" && (
-                      <button
+                      <button title={permissionTitle("violations.manage")}
                         type="button"
                         className="viol-primary"
-                        disabled={workingId === item.id}
+                        disabled={(workingId === item.id) || !hasPermission("violations.manage")}
                         onClick={() => changeStatus(item.id, "resolved")}
                       >
                         Закрыть
@@ -244,10 +245,10 @@ export default function ViolationsView() {
                     )}
 
                     {item.status === "resolved" && (
-                      <button
+                      <button title={permissionTitle("violations.manage")}
                         type="button"
                         className="viol-secondary"
-                        disabled={workingId === item.id}
+                        disabled={(workingId === item.id) || !hasPermission("violations.manage")}
                         onClick={() => changeStatus(item.id, "open")}
                       >
                         Открыть снова

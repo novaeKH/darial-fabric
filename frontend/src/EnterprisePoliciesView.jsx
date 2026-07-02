@@ -17,6 +17,7 @@ import {
 } from "./enterprisePoliciesApi";
 import "./enterprisePoliciesView.css";
 
+import { hasPermission, permissionTitle } from "./rbacPermissions";
 function downloadBlob(blob, filename) {
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement("a");
@@ -107,7 +108,11 @@ function CustomPolicyModal({ onClose, onSaved }) {
         </label>
 
         {error && <div className="epol-error">{error}</div>}
-        <button className="epol-save" onClick={save}><Save size={16} />Создать правило</button>
+        {hasPermission("policies.manage") && (
+          <button className="epol-save" onClick={save}>
+            <Save size={16} />Создать правило
+          </button>
+        )}
       </div>
     </div>
   );

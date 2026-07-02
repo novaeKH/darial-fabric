@@ -9,3 +9,8 @@ venv/
 node_modules/
 dist/
 coverage/
+
+# Darial local patch backups
+.darial_stage*_backup_*/
+*.before_readonly_fix
+*.before_rbac_tabs

@@ -20,6 +20,7 @@ import {
 } from "./accessApi";
 import "./accessView.css";
 
+import { hasPermission, permissionTitle } from "./rbacPermissions";
 function Metric({ icon: Icon, label, value, note, tone = "violet" }) {
   return (
     <article className={`acc-metric acc-tone-${tone}`}>
@@ -123,7 +124,7 @@ function UserModal({ roles, onClose, onSaved }) {
         )}
 
         {error && <div className="acc-error">{error}</div>}
-        <button className="acc-save" type="button" onClick={save}>
+        <button title={permissionTitle("rbac.manage")} disabled={!hasPermission("rbac.manage")} className="acc-save" type="button" onClick={save}>
           <Plus size={16} />
           Создать пользователя
         </button>
@@ -197,7 +198,7 @@ export default function AccessView() {
         </div>
 
         <div className="acc-actions">
-          <button type="button" onClick={() => setModal(true)}>
+          <button title={permissionTitle("rbac.manage")} disabled={!hasPermission("rbac.manage")} type="button" onClick={() => setModal(true)}>
             <Plus size={16} />
             Добавить пользователя
           </button>
@@ -238,7 +239,7 @@ export default function AccessView() {
 
               <div className="acc-role-list">
                 {user.assignments.map((assignment) => (
-                  <button
+                  <button title={permissionTitle("rbac.manage")} disabled={!hasPermission("rbac.manage")}
                     type="button"
                     title="Удалить назначение"
                     onClick={() => removeAssignment(assignment.id)}
@@ -255,7 +256,7 @@ export default function AccessView() {
                 {!user.assignments.length && <span>Роли не назначены</span>}
               </div>
 
-              <button
+              <button title={permissionTitle("rbac.manage")} disabled={!hasPermission("rbac.manage")}
                 type="button"
                 className={`acc-status acc-status-${user.status}`}
                 onClick={() => toggleStatus(user)}

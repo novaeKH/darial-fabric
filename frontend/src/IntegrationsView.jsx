@@ -21,6 +21,7 @@ import IngestionProcessorPanel from "./IngestionProcessorPanel";
 import IngestionOperationsPanel from "./IngestionOperationsPanel";
 import "./integrationsView.css";
 
+import { hasPermission, permissionTitle } from "./rbacPermissions";
 function Metric({ icon: Icon, label, value, note, tone = "violet" }) {
   return (
     <article className={`int-metric int-tone-${tone}`}>
@@ -83,7 +84,7 @@ function SourceModal({ onClose, onCreated }) {
         <label>Product ID, необязательно<input value={form.product_id} onChange={(e) => setForm({ ...form, product_id: e.target.value })} /></label>
 
         {error && <div className="int-error">{error}</div>}
-        <button className="int-create" onClick={create}><Plus size={16} />Создать источник и ключ</button>
+        <button title={permissionTitle("integrations.manage")} disabled={!hasPermission("integrations.manage")} className="int-create" onClick={create}><Plus size={16} />Создать источник и ключ</button>
       </div>
     </div>
   );

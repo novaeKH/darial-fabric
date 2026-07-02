@@ -35,6 +35,8 @@ from app.services.observability_service import (
     record_tool_call,
     start_run,
 )
+from fastapi import Request
+from app.security.product_scope import ensure_product_access, get_request_product_scope
 
 router = APIRouter(tags=["AI Observability"])
 
@@ -49,12 +51,19 @@ def register_ai_product(
 
 @router.get("/ai-products", response_model=list[AIProductRead])
 def list_ai_products(
+    request: Request,
     team_id: str | None = None,
     db: Session = Depends(get_db),
 ):
+    scope = get_request_product_scope(request, db)
     query = db.query(AIProduct)
+
+    if not scope.organization_wide:
+        query = query.filter(AIProduct.id.in_(scope.product_ids))
+
     if team_id:
         query = query.filter(AIProduct.owner_team_id == team_id)
+
     return query.order_by(AIProduct.created_at.desc()).all()
 
 
@@ -68,18 +77,29 @@ def register_agent_deployment(
 
 @router.get("/agent-deployments", response_model=list[AgentDeploymentRead])
 def list_agent_deployments(
+    request: Request,
     product_id: str | None = None,
     agent_id: str | None = None,
     environment: str | None = None,
     db: Session = Depends(get_db),
 ):
+    scope = get_request_product_scope(request, db)
+
+    if product_id:
+        ensure_product_access(scope, product_id)
+
     query = db.query(AgentDeployment)
+
+    if not scope.organization_wide:
+        query = query.filter(AgentDeployment.product_id.in_(scope.product_ids))
+
     if product_id:
         query = query.filter(AgentDeployment.product_id == product_id)
     if agent_id:
         query = query.filter(AgentDeployment.agent_id == agent_id)
     if environment:
         query = query.filter(AgentDeployment.environment == environment)
+
     return query.order_by(AgentDeployment.deployed_at.desc()).all()
 
 
@@ -177,19 +197,30 @@ def telemetry_record_outcome(
 
 @router.get("/observability/runs", response_model=list[AgentRunRead])
 def list_agent_runs(
+    request: Request,
     product_id: str | None = None,
     agent_id: str | None = None,
     status: str | None = None,
     limit: int = Query(default=100, ge=1, le=500),
     db: Session = Depends(get_db),
 ):
+    scope = get_request_product_scope(request, db)
+
+    if product_id:
+        ensure_product_access(scope, product_id)
+
     query = db.query(AgentRun)
+
+    if not scope.organization_wide:
+        query = query.filter(AgentRun.product_id.in_(scope.product_ids))
+
     if product_id:
         query = query.filter(AgentRun.product_id == product_id)
     if agent_id:
         query = query.filter(AgentRun.agent_id == agent_id)
     if status:
         query = query.filter(AgentRun.status == status)
+
     return query.order_by(AgentRun.created_at.desc()).limit(limit).all()
 
 
