@@ -1,0 +1,74 @@
+services:
+  redpanda:
+    image: redpandadata/redpanda:v24.1.21
+    container_name: darial-redpanda
+    restart: unless-stopped
+    command:
+      - redpanda
+      - start
+      - --overprovisioned
+      - --smp
+      - "1"
+      - --memory
+      - 512M
+      - --reserve-memory
+      - 0M
+      - --node-id
+      - "0"
+      - --check=false
+      - --kafka-addr
+      - internal://0.0.0.0:9092,external://0.0.0.0:19092
+      - --advertise-kafka-addr
+      - internal://redpanda:9092,external://localhost:19092
+      - --pandaproxy-addr
+      - 0.0.0.0:8082
+      - --advertise-pandaproxy-addr
+      - redpanda:8082
+    ports:
+      - "19092:19092"
+      - "19644:9644"
+    volumes:
+      - redpanda_data:/var/lib/redpanda/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "rpk cluster health -X brokers=localhost:9092 -e >/dev/null 2>&1"
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  redpanda-console:
+    image: redpandadata/console:v2.7.2
+    container_name: darial-redpanda-console
+    restart: unless-stopped
+    depends_on:
+      redpanda:
+        condition: service_healthy
+    environment:
+      KAFKA_BROKERS: redpanda:9092
+      KAFKA_SCHEMAREGISTRY_ENABLED: "false"
+    ports:
+      - "8088:8080"
+
+  backend:
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: redpanda:9092
+      KAFKA_TELEMETRY_TOPIC: darial.telemetry.events
+      KAFKA_DLQ_TOPIC: darial.telemetry.dlq
+    depends_on:
+      redpanda:
+        condition: service_healthy
+
+  ingestion-worker:
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: redpanda:9092
+      KAFKA_TELEMETRY_TOPIC: darial.telemetry.events
+      KAFKA_DLQ_TOPIC: darial.telemetry.dlq
+    depends_on:
+      redpanda:
+        condition: service_healthy
+
+volumes:
+  redpanda_data:
