@@ -11,6 +11,7 @@ from app.api.ingestion_routes import ensure_tables
 from app.core.database import get_db
 from app.models.base import Agent
 from app.models.observability import AgentDeployment, AgentRun, BusinessOutcome, LLMCall, ToolCall
+from app.services.clickhouse_telemetry import clickhouse_status, mirror_entity
 
 router = APIRouter(tags=["Telemetry Processor"])
 
@@ -132,7 +133,15 @@ def process_events(limit: int = Query(200, ge=1, le=1000), db: Session = Depends
         try:
             entity_id = fn(db, row)
             db.execute(text("UPDATE ingestion_events SET status='processed', processed_at=NOW(), error_message=NULL WHERE id=:id"), {"id": row["id"]})
-            db.commit(); result["processed"] += 1; result["results"].append({"event_id": row["event_id"], "entity_id": entity_id, "status": "processed"})
+            db.commit()
+            mirrored = mirror_entity(db, row["event_type"], entity_id)
+            result["processed"] += 1
+            result["results"].append({
+                "event_id": row["event_id"],
+                "entity_id": entity_id,
+                "status": "processed",
+                "clickhouse_mirrored": mirrored,
+            })
         except Exception as exc:
             db.rollback(); db.execute(text("UPDATE ingestion_events SET status='failed', error_message=:m WHERE id=:id"), {"id": row["id"], "m": str(exc)[:1000]}); db.commit(); result["failed"] += 1; result["results"].append({"event_id": row["event_id"], "status": "failed", "error": str(exc)})
     return result
@@ -153,3 +162,8 @@ def summary(db: Session = Depends(get_db)):
     result = {"accepted": 0, "processed": 0, "failed": 0, "unsupported": 0}
     for row in rows: result[row["status"]] = row["count"]
     result["total"] = sum(result.values()); return result
+
+@router.get("/ingestion/clickhouse-status")
+def get_clickhouse_status():
+    return clickhouse_status()
+
