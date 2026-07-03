@@ -591,11 +591,11 @@ export default function App() {
       <header className="app-header">
         <div className="app-header-main">
           <button className="brand brand-button" type="button" onClick={() => setActiveTab(firstAccessibleTab(tabs, rbacPermissions))}>
-            <div className="brand-logo" aria-label="Darial logo">
+            <div className="brand-logo" aria-label="Takt logo">
               <Network size={27} strokeWidth={2} />
             </div>
             <div>
-              <div className="brand-title">Darial</div>
+              <div className="brand-title">Takt</div>
               <div className="brand-subtitle">AI Control Center</div>
             </div>
           </button>
@@ -663,7 +663,7 @@ export default function App() {
         {!activeTab && (
           <div className="alert alert-danger">
             <Lock size={18} />
-            <span>Выберите активного пользователя с разрешениями Darial.</span>
+            <span>Выберите активного пользователя с разрешениями Takt.</span>
           </div>
         )}
 
@@ -676,7 +676,7 @@ export default function App() {
           </header>
         )}
 
-        {error && !String(error).includes("Choose a Darial principal") && (
+        {error && !String(error).includes("Choose a Takt principal") && (
           <div className="alert alert-danger">
             <AlertTriangle size={18} />
             <span>{typeof error === "string" ? error : JSON.stringify(error)}</span>

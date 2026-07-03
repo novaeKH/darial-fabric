@@ -2,6 +2,7 @@
 set -euo pipefail
 
 docker compose \
+  --project-name takt \
   -f docker-compose.yml \
   -f docker-compose.clickhouse.yml \
   -f docker-compose.kafka.yml \

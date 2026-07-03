@@ -1,7 +1,6 @@
 services:
   redpanda:
     image: redpandadata/redpanda:v24.1.21
-    container_name: darial-redpanda
     restart: unless-stopped
     command:
       - redpanda
@@ -41,7 +40,6 @@ services:
 
   redpanda-console:
     image: redpandadata/console:v2.7.2
-    container_name: darial-redpanda-console
     restart: unless-stopped
     depends_on:
       redpanda:

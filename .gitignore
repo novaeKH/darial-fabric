@@ -14,44 +14,42 @@ coverage/
 .darial_stage*_backup_*/
 *.before_readonly_fix
 *.before_rbac_tabs
-
 # Local Darial backups and generated reports
 .darial_*_backup_*/
 .ui_backup_*/
 .ui_polish_*_backup_*/
 .mvp_*_backup_*/
 final_smoke_report.txt
-.darial_stage*_backup_*/
-
 # Darial local backups and generated files
-.mvp_*_backup_*/
-.darial_*_backup_*/
 .ui_*_backup_*/
-final_smoke_report.txt
-.DS_Store
-__pycache__/
-*.pyc
-
 # Secrets and local environment
-.env
 .env.*
 !.env.example
-
 # Dependencies
-node_modules/
-.venv/
-venv/
-
 # Generated files
-__pycache__/
-*.pyc
 *.log
 *.dump
-.DS_Store
-
 # Local data and backups
 backups/
-.mvp_*_backup_*/
-.darial_*_backup_*/
-.ui_*_backup_*/
-final_smoke_report.txt
+# Environment and secrets
+# Python
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+# JavaScript
+frontend/node_modules/
+frontend/dist/
+# IDE and OS
+.idea/
+.vscode/
+# Logs and local reports
+takt_diagnostics_*.txt
+# Databases, dumps and backups
+*.sql
+*.tar
+*.tar.gz
+*_backup_*/
+.*_backup_*/
+# Local storage
+storage/
+backend/storage/

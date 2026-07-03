@@ -2,7 +2,6 @@ services:
   kafka-dlq-worker:
     build:
       context: ./backend
-    container_name: darial-kafka-dlq-worker
     command: python -m app.kafka_dlq_worker
     restart: unless-stopped
     env_file:

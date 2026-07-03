@@ -1,6 +1,6 @@
 
 /* =========================================================
-   Darial — unified light enterprise UI
+   Takt — unified light enterprise UI
    Loaded last so it safely normalizes legacy dark components.
    ========================================================= */
 
@@ -174,7 +174,7 @@
   border-color: var(--dui-border) !important;
 }
 
-/* ---------- Buttons: replace near-black with Darial purple ---------- */
+/* ---------- Buttons: replace near-black with Takt purple ---------- */
 
 .cc-header button,
 .acc-actions button,

@@ -13,7 +13,7 @@ export const TAB_PERMISSIONS = Object.freeze({
   access: ["rbac.manage", "platform.admin"],
   audit: ["audit.read", "platform.admin"],
 
-  // Legacy Darial screens are explicitly protected too. Unknown tabs are
+  // Legacy Takt screens are explicitly protected too. Unknown tabs are
   // denied rather than displayed by default.
   dashboard: ["platform.admin"],
   agents: ["platform.admin"],

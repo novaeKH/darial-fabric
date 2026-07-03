@@ -292,7 +292,7 @@
 .rep-table th{background:#f7f9fc!important}.rep-bar-track{background:#e8edf5!important}
 
 
-/* ===== Darial final management report ===== */
+/* ===== Takt final management report ===== */
 .rep-print-meta{display:none}
 .rep-metrics{grid-template-columns:repeat(6,minmax(0,1fr))}
 .rep-recommendations{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:16px}

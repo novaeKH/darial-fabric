@@ -109,9 +109,9 @@ function KeyModal({ data, onClose }) {
         <code className="int-key">{data.key.api_key}</code>
         <button className="int-create" onClick={copy}><Clipboard size={16} />Скопировать ключ</button>
 
-        <pre className="int-code">{`from darial_sdk import DarialClient
+        <pre className="int-code">{`from darial_sdk import TaktClient
 
-client = DarialClient(
+client = TaktClient(
     base_url="http://localhost:8000",
     api_key="${data.key.api_key}"
 )

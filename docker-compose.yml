@@ -1,8 +1,7 @@
-name: darial
+name: takt
 services:
   postgres:
     image: postgres:16
-    container_name: swf-postgres
     environment:
       POSTGRES_USER: swf_user
       POSTGRES_PASSWORD: swf_password
@@ -20,7 +19,6 @@ services:
 
   redis:
     image: redis:7
-    container_name: swf-redis
     ports:
       - "6379:6379"
     healthcheck:
@@ -32,7 +30,6 @@ services:
 
   minio:
     image: minio/minio
-    container_name: swf-minio
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: swf_minio
@@ -52,7 +49,6 @@ services:
   backend:
     build:
       context: ./backend
-    container_name: swf-backend
     ports:
       - "8000:8000"
     depends_on:
@@ -80,7 +76,6 @@ services:
   synthetic-worker:
     build:
       context: ./backend
-    container_name: swf-synthetic-worker
     command: python -m app.workers.synthetic_data_worker
     depends_on:
       postgres:
@@ -99,7 +94,6 @@ services:
   frontend:
     build:
       context: ./frontend
-    container_name: swf-frontend
     ports:
       - "5173:5173"
     depends_on:
@@ -111,7 +105,6 @@ services:
   ingestion-worker:
     build:
       context: ./backend
-    container_name: swf-ingestion-worker
     command: python -m app.ingestion_worker
     env_file:
       - ./backend/.env

@@ -125,7 +125,7 @@ export async function principalFetch(path, options = {}) {
   if (response.status === 401 || response.status === 403) {
     const error = new Error(
       response.status === 401
-        ? "Выберите пользователя Darial"
+        ? "Выберите пользователя Takt"
         : "У выбранной роли нет доступа"
     );
     error.status = response.status;

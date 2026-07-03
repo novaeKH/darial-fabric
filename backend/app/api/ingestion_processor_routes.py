@@ -177,7 +177,7 @@ def _process_outcome(db: Session, row: dict) -> str:
     p = row["payload_json"] or {}; run = _run(db, row.get("trace_id"), p)
     if not run: raise ValueError("Связанный AgentRun не найден")
     item = BusinessOutcome(
-        id=str(uuid.uuid4()), run_id=run.id, product_id=run.product_id,
+        id=str(uuid.uuid4()), run_id=run.id,
         outcome_type=p.get("outcome_type", "completed_task"), success=bool(p.get("success", True)),
         quantity=p.get("quantity", 1), quality_score=p.get("quality_score"),
         human_accepted=p.get("human_accepted"), time_saved_minutes=p.get("time_saved_minutes"),

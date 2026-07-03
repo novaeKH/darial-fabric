@@ -10,7 +10,7 @@ export const api = axios.create({
 
 
 
-// Darial principal interceptor
+// Takt principal interceptor
 api.interceptors.request.use((config) => {
   const principalId = localStorage.getItem("darial_principal_id");
 

@@ -7,6 +7,7 @@ from decimal import Decimal, ROUND_HALF_UP
 from app import models  # noqa: F401
 from app.core.database import Base, SessionLocal, engine
 from app.models.base import Agent
+from app.services.economics_service import calculate_llm_cost_breakdown
 from app.models.observability import (
     AIProduct,
     AgentDeployment,
@@ -26,8 +27,6 @@ from app.models.observability import (
 )
 
 DEMO_MARKER = "stage2_demo_telemetry"
-MILLION = Decimal("1000000")
-SECONDS_PER_HOUR = Decimal("3600")
 MONEY_STEP = Decimal("0.000001")
 
 PRODUCT_CONFIGS = {
@@ -94,14 +93,14 @@ def qmoney(value: Decimal) -> Decimal:
 
 def calculate_cost(endpoint: ModelEndpoint, *, input_tokens: int, output_tokens: int,
                    cached_tokens: int, reasoning_tokens: int, gpu_seconds: float) -> Decimal:
-    token_cost = (
-        Decimal(input_tokens) * endpoint.input_price_per_million
-        + Decimal(output_tokens) * endpoint.output_price_per_million
-        + Decimal(cached_tokens) * endpoint.cached_input_price_per_million
-        + Decimal(reasoning_tokens) * endpoint.reasoning_price_per_million
-    ) / MILLION
-    gpu_cost = (Decimal(str(gpu_seconds)) / SECONDS_PER_HOUR) * endpoint.gpu_hour_price
-    return qmoney(token_cost + gpu_cost)
+    return calculate_llm_cost_breakdown(
+        input_tokens=input_tokens,
+        output_tokens=output_tokens,
+        cached_tokens=cached_tokens,
+        reasoning_tokens=reasoning_tokens,
+        gpu_seconds=gpu_seconds,
+        endpoint=endpoint,
+    ).total_cost
 
 
 def clear_existing_demo(db) -> int:

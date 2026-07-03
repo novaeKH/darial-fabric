@@ -7,7 +7,7 @@ from app.api.rbac_routes import ensure_tables
 from app.core.database import SessionLocal
 
 USERS = [
-    ("admin@darial.local", "Darial Administrator", "admin"),
+    ("admin@takt.local", "Takt Administrator", "admin"),
     ("finops@darial.local", "AI FinOps Manager", "finops"),
     ("security@darial.local", "Security Officer", "security"),
     ("owner@darial.local", "AI Product Owner", "product_owner"),

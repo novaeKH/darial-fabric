@@ -614,7 +614,7 @@ export default function ReportsView() {
       </section>
 
       <footer className="rep-footer">
-        <span>Darial · Enterprise AI Control Center</span>
+        <span>Takt · Enterprise AI Control Center</span>
         <span>Отчёт предназначен для управленческого анализа AI-продуктов.</span>
       </footer>
     </section>

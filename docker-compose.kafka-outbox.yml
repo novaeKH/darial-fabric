@@ -2,7 +2,6 @@ services:
   kafka-outbox-publisher:
     build:
       context: ./backend
-    container_name: darial-kafka-outbox-publisher
     restart: unless-stopped
     command: python -m app.kafka_outbox_publisher
     env_file:

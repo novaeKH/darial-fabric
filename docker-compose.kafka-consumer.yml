@@ -2,7 +2,6 @@ services:
   telemetry-consumer:
     build:
       context: ./backend
-    container_name: darial-telemetry-consumer
     restart: unless-stopped
     command: python -m app.kafka_consumer
     env_file:

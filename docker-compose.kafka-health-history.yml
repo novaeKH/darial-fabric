@@ -2,7 +2,6 @@ services:
   kafka-health-snapshot-worker:
     build:
       context: ./backend
-    container_name: darial-kafka-health-snapshot-worker
     command: python -m app.kafka_health_snapshot_worker
     restart: unless-stopped
     env_file:

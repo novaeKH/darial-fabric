@@ -119,7 +119,7 @@ export default function OnboardingWizard({ onClose, onComplete }) {
 
   async function copy(text) { await navigator.clipboard.writeText(text); }
 
-  const snippet = result ? `# .env\nDARIAL_BASE_URL=http://localhost:8000\nDARIAL_API_KEY=${result.key.api_key}\n\n# Python\nfrom darial_sdk import DarialClient\n\nclient = DarialClient.from_env()\nwith client.run(\n    workflow="live-demo",\n    agent_name="${result.agent.name}",\n    product_id="${result.product.id}",\n    environment="${result.deployment.environment}",\n) as run:\n    run.record_llm_call(\n        provider="${result.model.provider}",\n        model_name="${result.model.model_name}",\n        input_tokens=1200,\n        output_tokens=240,\n        latency_ms=1800,\n    )\n    run.record_outcome(\n        outcome_type="task_completed",\n        success=True,\n        human_accepted=True,\n        time_saved_minutes=10,\n    )` : "";
+  const snippet = result ? `# .env\nDARIAL_BASE_URL=http://localhost:8000\nDARIAL_API_KEY=${result.key.api_key}\n\n# Python\nfrom darial_sdk import TaktClient\n\nclient = TaktClient.from_env()\nwith client.run(\n    workflow="live-demo",\n    agent_name="${result.agent.name}",\n    product_id="${result.product.id}",\n    environment="${result.deployment.environment}",\n) as run:\n    run.record_llm_call(\n        provider="${result.model.provider}",\n        model_name="${result.model.model_name}",\n        input_tokens=1200,\n        output_tokens=240,\n        latency_ms=1800,\n    )\n    run.record_outcome(\n        outcome_type="task_completed",\n        success=True,\n        human_accepted=True,\n        time_saved_minutes=10,\n    )` : "";
 
   return (
     <div className="ow-backdrop" onMouseDown={onClose}>
@@ -156,7 +156,7 @@ export default function OnboardingWizard({ onClose, onComplete }) {
                 <Field label="Цена входа / 1 млн токенов"><input type="number" min="0" step="0.01" value={form.inputPrice} onChange={set("inputPrice")} placeholder="0" /></Field>
                 <Field label="Цена выхода / 1 млн токенов"><input type="number" min="0" step="0.01" value={form.outputPrice} onChange={set("outputPrice")} placeholder="0" /></Field>
               </div>
-              <p className="ow-note">Darial использует этот тариф для серверного расчёта стоимости LLM-вызовов.</p>
+              <p className="ow-note">Takt использует этот тариф для серверного расчёта стоимости LLM-вызовов.</p>
             </section>
           </div>
           {error && <div className="ow-error">{error}</div>}

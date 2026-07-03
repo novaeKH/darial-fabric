@@ -25,7 +25,7 @@ function TokenStrip({ call }) {
 }
 function provenanceText(call) {
   const method = call?.cost_provenance?.pricing_method;
-  if (method === "server_calculated") return "Рассчитано Darial по серверному тарифу";
+  if (method === "server_calculated") return "Рассчитано Takt по серверному тарифу";
   if (method === "reported_by_integration") return "Передано интеграцией, не верифицировано";
   if (method === "not_calculated") return "Тариф не найден";
   return "Источник расчёта не указан";
