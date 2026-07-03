@@ -1,0 +1,212 @@
+
+/* =========================================================
+   Darial — final button & logo harmony
+   Unified controls, calmer hierarchy, cleaner brand mark.
+   ========================================================= */
+
+:root {
+  --dh-primary: #5b5bd6;
+  --dh-primary-hover: #4c4cc3;
+  --dh-primary-soft: #efefff;
+  --dh-text: #172033;
+  --dh-muted: #667187;
+  --dh-border: #d9e0ea;
+  --dh-surface: #ffffff;
+  --dh-surface-soft: #f5f7fb;
+  --dh-danger: #b63f4f;
+  --dh-danger-soft: #fff0f2;
+}
+
+/* ---------- Brand mark ---------- */
+
+.brand-logo {
+  background: var(--dh-primary) !important;
+  border: 1px solid rgba(91, 91, 214, 0.18) !important;
+  box-shadow: 0 8px 20px rgba(91, 91, 214, 0.18) !important;
+}
+
+.brand-logo svg {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+.brand-logo::before,
+.brand-logo::after {
+  display: none !important;
+}
+
+/* ---------- Global action button language ---------- */
+
+.cc-header button,
+.acc-actions button,
+.rep-actions button,
+.rep-actions a,
+.budget-actions button,
+.violations-actions button,
+.policies-actions button,
+.integrations-actions button,
+.reports-actions button,
+button.primary,
+.button-primary,
+.btn-primary {
+  min-height: 42px !important;
+  border-radius: 12px !important;
+  border: 1px solid var(--dh-primary) !important;
+  background: var(--dh-primary) !important;
+  color: #ffffff !important;
+  box-shadow: 0 5px 14px rgba(91, 91, 214, 0.16) !important;
+  font-weight: 800 !important;
+  transition:
+    background-color .16s ease,
+    border-color .16s ease,
+    transform .16s ease,
+    box-shadow .16s ease !important;
+}
+
+.cc-header button:hover,
+.acc-actions button:hover,
+.rep-actions button:hover,
+.rep-actions a:hover,
+.budget-actions button:hover,
+.violations-actions button:hover,
+.policies-actions button:hover,
+.integrations-actions button:hover,
+.reports-actions button:hover,
+button.primary:hover,
+.button-primary:hover,
+.btn-primary:hover {
+  background: var(--dh-primary-hover) !important;
+  border-color: var(--dh-primary-hover) !important;
+  box-shadow: 0 7px 18px rgba(76, 76, 195, 0.2) !important;
+  transform: translateY(-1px);
+}
+
+/* ---------- Secondary actions ---------- */
+
+.cc-header button + button,
+.rep-actions button:not(:first-of-type),
+.rep-actions a,
+.budget-actions button:not(:first-child),
+.violations-actions button:not(:first-child),
+.policies-actions button:not(:first-child),
+.integrations-actions button:not(:first-child),
+button.secondary,
+.button-secondary,
+.btn-secondary {
+  background: var(--dh-surface) !important;
+  color: var(--dh-text) !important;
+  border-color: var(--dh-border) !important;
+  box-shadow: none !important;
+}
+
+.cc-header button + button:hover,
+.rep-actions button:not(:first-of-type):hover,
+.rep-actions a:hover,
+.budget-actions button:not(:first-child):hover,
+.violations-actions button:not(:first-child):hover,
+.policies-actions button:not(:first-child):hover,
+.integrations-actions button:not(:first-child):hover,
+button.secondary:hover,
+.button-secondary:hover,
+.btn-secondary:hover {
+  background: var(--dh-surface-soft) !important;
+  color: var(--dh-primary-hover) !important;
+  border-color: #b9c2d1 !important;
+  box-shadow: none !important;
+}
+
+/* Refresh buttons should look secondary everywhere. */
+button[title*="Обнов"],
+button[aria-label*="Обнов"],
+button:has(svg.lucide-refresh-cw),
+button:has(svg.lucide-refresh-ccw) {
+  background: var(--dh-surface) !important;
+  color: var(--dh-text) !important;
+  border-color: var(--dh-border) !important;
+  box-shadow: none !important;
+}
+
+button[title*="Обнов"]:hover,
+button[aria-label*="Обнов"]:hover,
+button:has(svg.lucide-refresh-cw):hover,
+button:has(svg.lucide-refresh-ccw):hover {
+  background: var(--dh-surface-soft) !important;
+  color: var(--dh-primary-hover) !important;
+  border-color: #b9c2d1 !important;
+}
+
+/* Warning/recalculate actions are not primary brand actions. */
+button:has(svg.lucide-triangle-alert),
+button:has(svg.lucide-alert-triangle) {
+  background: var(--dh-surface) !important;
+  color: var(--dh-text) !important;
+  border-color: var(--dh-border) !important;
+  box-shadow: none !important;
+}
+
+button:has(svg.lucide-triangle-alert):hover,
+button:has(svg.lucide-alert-triangle):hover {
+  background: #fff9ec !important;
+  color: #9b671b !important;
+  border-color: #ead8ad !important;
+}
+
+/* Destructive actions keep a calm red semantic style. */
+button.danger,
+.button-danger,
+.btn-danger,
+button[aria-label*="Удал"],
+button[title*="Удал"] {
+  background: var(--dh-danger-soft) !important;
+  color: var(--dh-danger) !important;
+  border-color: #efcfd5 !important;
+  box-shadow: none !important;
+}
+
+/* ---------- Icon alignment inside actions ---------- */
+
+.cc-header button svg,
+.acc-actions button svg,
+.rep-actions button svg,
+.rep-actions a svg,
+.budget-actions button svg,
+.violations-actions button svg,
+.policies-actions button svg,
+.integrations-actions button svg {
+  width: 17px !important;
+  height: 17px !important;
+  flex: 0 0 17px !important;
+  stroke-width: 2 !important;
+}
+
+/* ---------- Remove old dark button residue ---------- */
+
+.cc-header button,
+.acc-actions button,
+.rep-actions button,
+.rep-actions a,
+.budget-actions button,
+.violations-actions button,
+.policies-actions button,
+.integrations-actions button {
+  text-shadow: none !important;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 760px) {
+  .cc-header button,
+  .acc-actions button,
+  .rep-actions button,
+  .rep-actions a,
+  .budget-actions button,
+  .violations-actions button,
+  .policies-actions button,
+  .integrations-actions button {
+    min-height: 40px !important;
+    border-radius: 10px !important;
+    box-shadow: none !important;
+  }
+}

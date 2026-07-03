@@ -16,6 +16,7 @@ import {
   KeyRound,
   LayoutDashboard,
   MoreHorizontal,
+  Network,
   Play,
   RefreshCcw,
   ScrollText,
@@ -66,6 +67,8 @@ import AccessView from "./AccessView";
 
 import KafkaDlqPanel from "./components/KafkaDlqPanel";
 import "./darialLightUi.css";
+import "./logoStatusFix.css";
+import "./buttonLogoHarmony.css";
 
 
 const tabs = [
@@ -589,7 +592,7 @@ export default function App() {
         <div className="app-header-main">
           <button className="brand brand-button" type="button" onClick={() => setActiveTab(firstAccessibleTab(tabs, rbacPermissions))}>
             <div className="brand-logo" aria-label="Darial logo">
-              <Shield size={25} strokeWidth={2.2} />
+              <Network size={27} strokeWidth={2} />
             </div>
             <div>
               <div className="brand-title">Darial</div>

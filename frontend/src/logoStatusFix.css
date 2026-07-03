@@ -1,0 +1,80 @@
+
+/* Darial final logo/status polish */
+
+/* Budget statuses: calm semantic pastel chips instead of dark pills. */
+.budget-status {
+  display: inline-flex !important;
+  align-items: center !important;
+  min-height: 28px !important;
+  padding: 5px 10px !important;
+  border: 1px solid transparent !important;
+  border-radius: 999px !important;
+  box-shadow: none !important;
+  font-size: 10px !important;
+  font-weight: 850 !important;
+  line-height: 1 !important;
+  letter-spacing: 0 !important;
+}
+
+.budget-status-healthy {
+  background: #e8f7ef !important;
+  color: #18764f !important;
+  border-color: #ccebdc !important;
+}
+
+.budget-status-warning {
+  background: #fff5df !important;
+  color: #9a6519 !important;
+  border-color: #f1dfb8 !important;
+}
+
+.budget-status-critical {
+  background: #fff0f1 !important;
+  color: #b64050 !important;
+  border-color: #f1d0d5 !important;
+}
+
+.budget-status-unconfigured {
+  background: #f1f3f7 !important;
+  color: #68748a !important;
+  border-color: #dde2ea !important;
+}
+
+/* Other common status pills across Control Center views. */
+.cc-badge,
+.acc-status,
+.rd-status,
+.violation-status,
+.policy-status,
+.integration-status {
+  box-shadow: none !important;
+}
+
+.cc-badge-good,
+.acc-status-active,
+.rd-status.is-good {
+  background: #e8f7ef !important;
+  color: #18764f !important;
+  border-color: #ccebdc !important;
+}
+
+.cc-badge:not(.cc-badge-good),
+.acc-status-disabled,
+.rd-status.is-bad {
+  background: #f1f3f7 !important;
+  color: #68748a !important;
+  border-color: #dde2ea !important;
+}
+
+/* Brand mark: keep the existing container but make the network icon cleaner. */
+.brand-logo svg {
+  width: 29px !important;
+  height: 29px !important;
+  stroke-width: 2 !important;
+}
+
+.brand-logo {
+  background:
+    radial-gradient(circle at 28% 25%, rgba(255,255,255,.28), transparent 26%),
+    linear-gradient(145deg, #6d70f4 0%, #4f57de 100%) !important;
+}

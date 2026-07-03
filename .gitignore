@@ -22,3 +22,12 @@ coverage/
 .mvp_*_backup_*/
 final_smoke_report.txt
 .darial_stage*_backup_*/
+
+# Darial local backups and generated files
+.mvp_*_backup_*/
+.darial_*_backup_*/
+.ui_*_backup_*/
+final_smoke_report.txt
+.DS_Store
+__pycache__/
+*.pyc
