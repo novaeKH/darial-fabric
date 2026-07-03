@@ -1,8 +1,8 @@
-# Darial
+# Takt
 
 **Enterprise AI Control Center для наблюдаемости, экономики и управления корпоративными AI-системами.**
 
-Darial ведёт единый реестр AI-продуктов и агентов, принимает телеметрию их запусков, рассчитывает стоимость LLM-вызовов, связывает расходы с бизнес-результатами и фиксирует нарушения политик.
+Takt ведёт единый реестр AI-продуктов и агентов, принимает телеметрию их запусков, рассчитывает стоимость LLM-вызовов, связывает расходы с бизнес-результатами и фиксирует нарушения политик.
 
 ```text
 Registry → Telemetry → Runs → Cost → Outcome → Governance → Report
@@ -194,8 +194,8 @@ SDK и ingestion API заменяют значения полей `authorization
 ### 1. Клонирование
 
 ```bash
-git clone https://github.com/novaeKH/darial-fabric.git
-cd darial-fabric
+git clone https://github.com/novaeKH/takt-ai-control-center.git
+cd takt-ai-control-center
 ```
 
 ### 2. Конфигурация
@@ -244,7 +244,7 @@ docker compose exec backend python -m app.demo_telemetry_seed --days 30
 | MinIO API | http://localhost:9000 |
 | MinIO Console | http://localhost:9001 |
 
-В интерфейсе выберите пользователя **Darial Administrator**.
+В интерфейсе выберите пользователя **Takt Administrator**.
 
 ### Остановка
 
