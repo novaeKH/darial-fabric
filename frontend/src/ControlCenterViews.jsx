@@ -8,6 +8,7 @@ import {
   Cpu,
   ExternalLink,
   RefreshCcw,
+  Plus,
   X,
 } from "lucide-react";
 import {
@@ -17,7 +18,9 @@ import {
   getObservabilityRuns,
   getRunDetails,
 } from "./controlCenterApi";
+import OnboardingWizard from "./OnboardingWizard";
 import "./controlCenter.css";
+import RunDetailsDrawer from "./RunDetailsDrawer";
 
 const money = new Intl.NumberFormat("ru-RU", {
   minimumFractionDigits: 2,
@@ -80,7 +83,7 @@ function useData() {
   return { products, deployments, runs, agentSummaries, loading, error, load };
 }
 
-function Header({ eyebrow, title, text, loading, onRefresh }) {
+function Header({ eyebrow, title, text, loading, onRefresh, actionLabel, onAction }) {
   return (
     <header className="cc-header">
       <div>
@@ -88,10 +91,13 @@ function Header({ eyebrow, title, text, loading, onRefresh }) {
         <h2>{title}</h2>
         <p>{text}</p>
       </div>
-      <button type="button" onClick={onRefresh} disabled={loading}>
-        <RefreshCcw size={16} className={loading ? "cc-spin" : ""} />
-        Обновить
-      </button>
+      <div className="cc-header-actions">
+        {onAction && <button className="cc-primary-action" type="button" onClick={onAction}><Plus size={16}/>{actionLabel}</button>}
+        <button type="button" onClick={onRefresh} disabled={loading}>
+          <RefreshCcw size={16} className={loading ? "cc-spin" : ""} />
+          Обновить
+        </button>
+      </div>
     </header>
   );
 }
@@ -119,101 +125,12 @@ function Badge({ value }) {
 }
 
 function RunDrawer({ runId, onClose }) {
-  const [data, setData] = useState(null);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    let active = true;
-    getRunDetails(runId)
-      .then((value) => active && setData(value))
-      .catch((err) => active && setError(err?.message || "Ошибка загрузки run"));
-    return () => { active = false; };
-  }, [runId]);
-
-  return (
-    <div className="cc-drawer-backdrop" onMouseDown={onClose}>
-      <aside className="cc-drawer" onMouseDown={(event) => event.stopPropagation()}>
-        <div className="cc-drawer-head">
-          <div>
-            <span>RUN DETAILS</span>
-            <h3>{data?.run?.workflow_name || "Загрузка…"}</h3>
-          </div>
-          <button type="button" onClick={onClose}><X size={18} /></button>
-        </div>
-
-        {error && <div className="cc-error">{error}</div>}
-        {!data && !error && <div className="cc-loading">Загрузка трассировки…</div>}
-
-        {data && (
-          <div className="cc-drawer-body">
-            <div className="cc-detail-grid">
-              <div><span>Продукт</span><strong>{data.product?.name || "—"}</strong></div>
-              <div><span>Агент</span><strong>{data.agent?.name || "—"}</strong></div>
-              <div><span>Статус</span><strong><Badge value={data.run.status} /></strong></div>
-              <div><span>Среда</span><strong>{data.run.environment}</strong></div>
-              <div><span>Стоимость</span><strong>{formatMoney(data.run.total_cost)}</strong></div>
-              <div><span>Latency</span><strong>{formatDuration(data.run.latency_ms)}</strong></div>
-              <div className="cc-detail-wide"><span>Trace ID</span><strong>{data.run.trace_id}</strong></div>
-            </div>
-
-            <section className="cc-detail-section">
-              <h4>LLM-вызовы <em>{data.llm_calls.length}</em></h4>
-              {data.llm_calls.map((call) => (
-                <article className="cc-event" key={call.id}>
-                  <div>
-                    <strong>{call.model_name}</strong>
-                    <span>{call.provider} · {formatNumber(call.total_tokens)} токенов</span>
-                  </div>
-                  <div>
-                    <strong>{formatMoney(call.estimated_cost)}</strong>
-                    <span>{formatDuration(call.latency_ms)}</span>
-                  </div>
-                </article>
-              ))}
-              {!data.llm_calls.length && <div className="cc-empty-row">LLM-вызовов нет.</div>}
-            </section>
-
-            <section className="cc-detail-section">
-              <h4>Инструменты <em>{data.tool_calls.length}</em></h4>
-              {data.tool_calls.map((call) => (
-                <article className="cc-event" key={call.id}>
-                  <div><strong>{call.tool_name}</strong><span>{call.status}</span></div>
-                  <div><strong>{formatMoney(call.estimated_cost)}</strong><span>{formatDuration(call.latency_ms)}</span></div>
-                </article>
-              ))}
-              {!data.tool_calls.length && <div className="cc-empty-row">Tool calls отсутствуют.</div>}
-            </section>
-
-            <section className="cc-detail-section">
-              <h4>Бизнес-результат <em>{data.outcomes.length}</em></h4>
-              {data.outcomes.map((outcome) => (
-                <article className="cc-event" key={outcome.id}>
-                  <div><strong>{outcome.outcome_type}</strong><span>{outcome.success ? "Успешно" : "Неуспешно"}</span></div>
-                  <div><strong>{outcome.quality_score == null ? "—" : formatPercent(outcome.quality_score)}</strong><span>качество</span></div>
-                </article>
-              ))}
-              {!data.outcomes.length && <div className="cc-empty-row">Outcome не зарегистрирован.</div>}
-            </section>
-
-            <section className="cc-detail-section">
-              <h4>Нарушения <em>{data.violations.length}</em></h4>
-              {data.violations.map((violation) => (
-                <article className="cc-event cc-event-warning" key={violation.id}>
-                  <div><strong>{violation.policy_code}</strong><span>{violation.description}</span></div>
-                  <Badge value={violation.severity} />
-                </article>
-              ))}
-              {!data.violations.length && <div className="cc-empty-row">Нарушений не обнаружено.</div>}
-            </section>
-          </div>
-        )}
-      </aside>
-    </div>
-  );
+  return <RunDetailsDrawer runId={runId} onClose={onClose} />;
 }
 
 export function AiProductsView() {
   const data = useData();
+  const [onboardingOpen, setOnboardingOpen] = useState(false);
 
   const rows = useMemo(() => data.products.map((product) => {
     const agents = data.agentSummaries.filter((item) => item.product_id === product.id);
@@ -230,16 +147,18 @@ export function AiProductsView() {
   return (
     <section className="cc-page">
       <Header
-        eyebrow="AI ASSET REGISTRY"
+        eyebrow="РЕЕСТР AI-СИСТЕМ"
         title="AI-продукты"
         text="Единый реестр корпоративных AI-систем, их владельцев, агентов и фактических расходов."
         loading={data.loading}
         onRefresh={data.load}
+        actionLabel="Подключить AI-систему"
+        onAction={() => setOnboardingOpen(true)}
       />
       {data.error && <div className="cc-error">{data.error}</div>}
       <div className="cc-metrics">
         <Metric icon={Boxes} label="AI-продукты" value={formatNumber(rows.length)} note="Зарегистрировано" />
-        <Metric icon={Bot} label="Агенты" value={formatNumber(data.agentSummaries.length)} note="Активные deployments" />
+        <Metric icon={Bot} label="Агенты" value={formatNumber(data.agentSummaries.length)} note="Активные развёртывания" />
         <Metric icon={Coins} label="Расходы" value={formatMoney(rows.reduce((s, x) => s + x.cost, 0))} note="Вся телеметрия" />
         <Metric icon={Cpu} label="Токены" value={formatNumber(rows.reduce((s, x) => s + x.tokens, 0))} note="Все модели" />
       </div>
@@ -264,12 +183,18 @@ export function AiProductsView() {
               </div>
               <div className="cc-card-footer">
                 <span>{formatNumber(product.tokens)} токенов</span>
-                <span>{product.criticality || "standard"}</span>
+                <span>{({ low: "Низкая", medium: "Средняя", high: "Высокая", critical: "Критическая", standard: "Стандартная" }[product.criticality] || product.criticality || "Стандартная")}</span>
               </div>
             </article>
           );
         })}
       </div>
+      {onboardingOpen && (
+        <OnboardingWizard
+          onClose={() => setOnboardingOpen(false)}
+          onComplete={() => data.load()}
+        />
+      )}
     </section>
   );
 }
@@ -280,7 +205,7 @@ export function AiAgentsView() {
   return (
     <section className="cc-page">
       <Header
-        eyebrow="AGENT REGISTRY"
+        eyebrow="РЕЕСТР АГЕНТОВ"
         title="Агенты"
         text="Версии, окружения, модели, токены, расходы и надёжность зарегистрированных агентов."
         loading={data.loading}
@@ -292,7 +217,7 @@ export function AiAgentsView() {
           <thead>
             <tr>
               <th>Агент</th><th>Продукт</th><th>Среда</th><th>Версия</th>
-              <th>Runs</th><th>Успешность</th><th>Токены</th><th>Стоимость</th><th>Модель</th><th>Активность</th>
+              <th>Запуски</th><th>Успешность</th><th>Токены</th><th>Стоимость</th><th>Модель</th><th>Активность</th>
             </tr>
           </thead>
           <tbody>
@@ -335,7 +260,7 @@ export function AgentRunsView() {
   return (
     <section className="cc-page">
       <Header
-        eyebrow="EXECUTION TRACES"
+        eyebrow="ИСТОРИЯ ВЫПОЛНЕНИЯ"
         title="Запуски агентов"
         text="Откройте run, чтобы увидеть LLM-вызовы, инструменты, стоимость, outcome и нарушения."
         loading={data.loading}
@@ -343,15 +268,15 @@ export function AgentRunsView() {
       />
       {data.error && <div className="cc-error">{data.error}</div>}
       <div className="cc-metrics">
-        <Metric icon={Activity} label="Runs" value={formatNumber(rows.length)} note="Последние 500" />
+        <Metric icon={Activity} label="Запуски" value={formatNumber(rows.length)} note="Последние 500" />
         <Metric icon={Coins} label="Стоимость" value={formatMoney(rows.reduce((s, r) => s + runCost(r), 0))} note="Суммарно" />
         <Metric icon={Bot} label="Агенты" value={formatNumber(data.agentSummaries.length)} note="В реестре" />
-        <Metric icon={CircleAlert} label="Ошибки" value={formatNumber(rows.filter((r) => !isSuccess(r)).length)} note="Неуспешные runs" />
+        <Metric icon={CircleAlert} label="Ошибки" value={formatNumber(rows.filter((r) => !isSuccess(r)).length)} note="Неуспешные запуски" />
       </div>
       <div className="cc-table-card">
         <table className="cc-table cc-runs-table">
           <thead>
-            <tr><th>Время</th><th>Продукт</th><th>Агент</th><th>Статус</th><th>Стоимость</th><th>Latency</th><th /></tr>
+            <tr><th>Время</th><th>Продукт</th><th>Агент</th><th>Статус</th><th>Стоимость</th><th>Задержка</th><th /></tr>
           </thead>
           <tbody>
             {rows.map((run) => (

@@ -81,3 +81,12 @@
     min-height: auto !important;
   }
 }
+
+/* ===== DARIAL LIGHT UI V4 ===== */
+.acc-metric,.acc-panel,.acc-role-grid>article,.acc-role-list button,.acc-modal,.acc-empty,.acc-audit article{
+  background:#fff!important;color:#172033!important;border-color:#e3e8f1!important;
+  box-shadow:0 8px 24px rgba(35,48,78,.045)!important}
+.acc-role-grid>article,.acc-role-list button,.acc-audit article{background:#f7f9fc!important;box-shadow:none!important}
+.acc-metric>span,.acc-metric>small,.acc-user-main span,.acc-role-grid p,.acc-role-list button span,.acc-audit span,.acc-audit time,.acc-empty{color:#707a91!important}
+.acc-metric>strong,.acc-user-main strong,.acc-role-grid h4,.acc-audit strong{color:#172033!important}
+.acc-modal input,.acc-modal select{background:#fff!important;color:#172033!important;border-color:#dfe5ef!important}

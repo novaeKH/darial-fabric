@@ -50,11 +50,13 @@ function runCost(run) {
 }
 
 function runTokens(run) {
-  return n(firstValue(run, ["total_tokens"])) ||
-    n(run.input_tokens) +
-      n(run.output_tokens) +
-      n(run.cached_tokens) +
-      n(run.reasoning_tokens);
+  const total = n(firstValue(run, ["total_tokens"]));
+  if (total > 0) return total;
+
+  // Cached tokens are included in input tokens, and reasoning tokens are
+  // included in output tokens. They are displayed separately in details,
+  // but must not be counted twice in the run total.
+  return n(run.input_tokens) + n(run.output_tokens);
 }
 
 function runDate(run) {
@@ -378,9 +380,9 @@ export default function ObservabilityDashboard() {
     <section className="obs-page">
       <header className="obs-hero">
         <div>
-          <div className="obs-eyebrow"><Zap size={15} /> AI ECONOMICS & VALUE</div>
-          <h2>Экономика и эффективность AI</h2>
-          <p>Единый обзор потребления токенов, стоимости, надёжности и бизнес-результатов AI-систем.</p>
+          <div className="obs-eyebrow"><Zap size={15} /> ОБЗОР ЗА ПЕРИОД</div>
+          <h2>Обзор AI-систем</h2>
+          <p>Расходы, бизнес-результаты, качество работы и ключевые риски.</p>
         </div>
         <div className="obs-actions">
           <select value={period} onChange={(event) => setPeriod(event.target.value)}>
@@ -400,20 +402,20 @@ export default function ObservabilityDashboard() {
       {loading && !summary ? <div className="obs-loading">Загрузка аналитики…</div> : (
         <>
           <div className="obs-stats-grid">
-            <StatCard title="Общие расходы" value={formatMoney(totalCost)} subtitle={`Прогноз: ${formatMoney(forecast)}`} icon={WalletCards} tone="violet" />
-            <StatCard title="Всего токенов" value={formatCompact(totalTokens)} subtitle={`${integer.format(n(summary?.total_requests))} LLM-запросов`} icon={Coins} tone="blue" />
-            <StatCard title="Успешность" value={formatPercent(totalRuns ? successfulRuns / totalRuns : 0)} subtitle={`${successfulRuns} из ${totalRuns} запусков`} icon={Target} tone="green" />
-            <StatCard title="Стоимость результата" value={costPerOutcome == null ? "—" : formatMoney(costPerOutcome)} subtitle={`${integer.format(successfulOutcomes)} полезных outcomes`} icon={Gauge} tone="cyan" />
-            <StatCard title="Потери" value={formatMoney(failedCost)} subtitle={`${formatPercent(wasteRate)} всех расходов`} icon={AlertTriangle} tone="red" />
-            <StatCard title="Средняя задержка" value={averageLatency == null ? "—" : formatDuration(averageLatency)} subtitle="На один agent run" icon={Timer} tone="amber" />
+            <StatCard title="Расходы за период" value={formatMoney(totalCost)} subtitle={`Прогноз: ${formatMoney(forecast)}`} icon={WalletCards} tone="violet" />
+            <StatCard title="Использовано токенов" value={formatCompact(totalTokens)} subtitle={`${integer.format(n(summary?.total_requests))} LLM-запросов`} icon={Coins} tone="blue" />
+            <StatCard title="Успешность запусков" value={formatPercent(totalRuns ? successfulRuns / totalRuns : 0)} subtitle={`${successfulRuns} из ${totalRuns} запусков`} icon={Target} tone="green" />
+            <StatCard title="Цена полезного результата" value={costPerOutcome == null ? "—" : formatMoney(costPerOutcome)} subtitle={`${integer.format(successfulOutcomes)} полезных результатов`} icon={Gauge} tone="cyan" />
+            <StatCard title="Потери на ошибках" value={formatMoney(failedCost)} subtitle={`${formatPercent(wasteRate)} всех расходов`} icon={AlertTriangle} tone="red" />
+            <StatCard title="Среднее время запуска" value={averageLatency == null ? "—" : formatDuration(averageLatency)} subtitle="На один запуск" icon={Timer} tone="amber" />
           </div>
 
           <div className="obs-main-grid">
             <article className="obs-panel obs-panel-wide">
               <div className="obs-panel-header">
                 <div>
-                  <h3>Динамика расходов</h3>
-                  <p>Фактическая стоимость agent runs по дням</p>
+                  <h3>Расходы по дням</h3>
+                  <p>Как менялась стоимость работы AI-систем</p>
                 </div>
                 <strong>{formatMoney(daily.reduce((sum, item) => sum + item.cost, 0))}</strong>
               </div>
@@ -423,7 +425,7 @@ export default function ObservabilityDashboard() {
             <article className="obs-panel">
               <div className="obs-panel-header">
                 <div>
-                  <h3>Надёжность запусков</h3>
+                  <h3>Качество запусков</h3>
                   <p>Успешные и ошибочные выполнения</p>
                 </div>
               </div>
@@ -433,8 +435,8 @@ export default function ObservabilityDashboard() {
             <article className="obs-panel">
               <div className="obs-panel-header">
                 <div>
-                  <h3>Самые затратные агенты</h3>
-                  <p>Рейтинг по суммарной стоимости</p>
+                  <h3>Основные источники расходов</h3>
+                  <p>Агенты с наибольшими расходами</p>
                 </div>
                 <Bot size={20} />
               </div>
@@ -444,8 +446,8 @@ export default function ObservabilityDashboard() {
             <article className="obs-panel obs-panel-wide">
               <div className="obs-panel-header">
                 <div>
-                  <h3>Автоматические выводы</h3>
-                  <p>Что требует внимания владельца AI-платформы</p>
+                  <h3>Требует внимания</h3>
+                  <p>Рекомендации по затратам, качеству и эффективности</p>
                 </div>
                 <Activity size={20} />
               </div>
@@ -458,8 +460,8 @@ export default function ObservabilityDashboard() {
           <article className="obs-panel obs-runs-panel">
             <div className="obs-panel-header">
               <div>
-                <h3>Последние agent runs</h3>
-                <p>Технический статус, токены, стоимость и latency</p>
+                <h3>Последние запуски</h3>
+                <p>Статус, потребление ресурсов, стоимость и время выполнения</p>
               </div>
               <span className="obs-count">{filteredRuns.length} записей</span>
             </div>

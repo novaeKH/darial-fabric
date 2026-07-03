@@ -22,6 +22,8 @@ from app.core.config import settings
 from app.core.database import Base, engine
 from app.api.kafka_routes import router as kafka_router
 from app.api.kafka_dlq_routes import router as kafka_dlq_router
+from app.api.kafka_health_routes import router as kafka_health_router
+from app.api.kafka_health_history_routes import router as kafka_health_history_router
 
 
 @asynccontextmanager
@@ -46,6 +48,8 @@ app = FastAPI(
     lifespan=lifespan,
 )
 app.include_router(kafka_dlq_router)
+app.include_router(kafka_health_router)
+app.include_router(kafka_health_history_router)
 
 app.middleware("http")(rbac_middleware)
 

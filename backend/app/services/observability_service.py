@@ -7,6 +7,11 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.models.base import Agent, Team
+from app.services.economics_service import (
+    as_decimal,
+    calculate_llm_cost_breakdown,
+    effective_outcome_quantity,
+)
 from app.models.observability import (
     AIProduct,
     AgentDeployment,
@@ -251,21 +256,14 @@ def _resolve_model_endpoint(
 def calculate_llm_cost(payload: LLMCallCreate, endpoint: ModelEndpoint | None) -> Decimal:
     if endpoint is None:
         return Decimal("0")
-
-    token_cost = (
-        _as_decimal(payload.input_tokens) * endpoint.input_price_per_million
-        + _as_decimal(payload.output_tokens) * endpoint.output_price_per_million
-        + _as_decimal(payload.cached_tokens)
-        * endpoint.cached_input_price_per_million
-        + _as_decimal(payload.reasoning_tokens)
-        * endpoint.reasoning_price_per_million
-    ) / MILLION
-
-    gpu_cost = (
-        _as_decimal(payload.gpu_seconds) / SECONDS_PER_HOUR
-    ) * endpoint.gpu_hour_price
-
-    return (token_cost + gpu_cost).quantize(Decimal("0.000001"))
+    return calculate_llm_cost_breakdown(
+        input_tokens=payload.input_tokens,
+        output_tokens=payload.output_tokens,
+        cached_tokens=payload.cached_tokens,
+        reasoning_tokens=payload.reasoning_tokens,
+        gpu_seconds=payload.gpu_seconds,
+        endpoint=endpoint,
+    ).total_cost
 
 
 def record_llm_call(
@@ -283,7 +281,28 @@ def record_llm_call(
     except ValueError as exc:
         raise HTTPException(status_code=400, detail="Invalid token source") from exc
 
-    estimated_cost = calculate_llm_cost(payload, endpoint)
+    breakdown = (
+        calculate_llm_cost_breakdown(
+            input_tokens=payload.input_tokens,
+            output_tokens=payload.output_tokens,
+            cached_tokens=payload.cached_tokens,
+            reasoning_tokens=payload.reasoning_tokens,
+            gpu_seconds=payload.gpu_seconds,
+            endpoint=endpoint,
+        )
+        if endpoint is not None
+        else None
+    )
+    estimated_cost = breakdown.total_cost if breakdown else Decimal("0")
+    metadata_json = dict(payload.metadata_json or {})
+    metadata_json["cost_provenance"] = (
+        breakdown.as_metadata()
+        if breakdown
+        else {
+            "pricing_method": "not_calculated",
+            "reason": "model_endpoint_not_found",
+        }
+    )
     llm_call = LLMCall(
         run_id=run.id,
         model_endpoint_id=endpoint.id if endpoint else None,
@@ -298,7 +317,7 @@ def record_llm_call(
         status=payload.status,
         token_source=token_source,
         estimated_cost=estimated_cost,
-        metadata_json=payload.metadata_json,
+        metadata_json=metadata_json,
     )
     db.add(llm_call)
     run.request_count += 1
@@ -322,7 +341,13 @@ def record_tool_call(
         status=payload.status,
         latency_ms=payload.latency_ms,
         estimated_cost=_as_decimal(payload.estimated_cost),
-        metadata_json=payload.metadata_json,
+        metadata_json={
+            **(payload.metadata_json or {}),
+            "cost_provenance": {
+                "pricing_method": "reported_by_integration",
+                "verified": False,
+            },
+        },
     )
     db.add(tool_call)
     run.total_cost = _as_decimal(run.total_cost) + _as_decimal(payload.estimated_cost)
@@ -427,17 +452,50 @@ def get_dashboard_summary(
         reasoning_tokens,
     ) = llm_query.one()
 
-    successful_outcomes = (
-        db.query(func.coalesce(func.sum(BusinessOutcome.quantity), 0))
-        .join(AgentRun, BusinessOutcome.run_id == AgentRun.id)
-        .filter(*run_filters, BusinessOutcome.success.is_(True))
-        .scalar()
-        or 0
+    period_runs = db.query(AgentRun).filter(*run_filters).all()
+    period_run_ids = [run.id for run in period_runs]
+    period_outcomes = (
+        db.query(BusinessOutcome)
+        .filter(BusinessOutcome.run_id.in_(period_run_ids))
+        .all()
+        if period_run_ids
+        else []
     )
+    outcomes_by_run: dict[str, list[BusinessOutcome]] = {}
+    for outcome in period_outcomes:
+        outcomes_by_run.setdefault(outcome.run_id, []).append(outcome)
+
+    successful_outcomes_float = sum(
+        effective_outcome_quantity(outcome) for outcome in period_outcomes
+    )
+    total_business_value = sum(
+        float(outcome.estimated_business_value or 0)
+        for outcome in period_outcomes
+        if effective_outcome_quantity(outcome) > 0
+    )
+    total_time_saved_minutes = sum(
+        float(outcome.time_saved_minutes or 0)
+        for outcome in period_outcomes
+        if effective_outcome_quantity(outcome) > 0
+    )
+
+    rejected_run_cost = 0.0
+    for run in period_runs:
+        run_outcomes = outcomes_by_run.get(run.id, [])
+        if (
+            str(getattr(run.status, "value", run.status)).lower()
+            in {"completed", "success", "ok"}
+            and run_outcomes
+            and sum(effective_outcome_quantity(item) for item in run_outcomes) == 0
+        ):
+            rejected_run_cost += float(run.total_cost or 0)
 
     total_cost_float = float(total_cost)
     failed_cost_float = float(failed_run_cost)
-    successful_outcomes_float = float(successful_outcomes)
+    waste_cost_float = min(
+        total_cost_float,
+        failed_cost_float + rejected_run_cost,
+    )
 
     return {
         "period_from": date_from,
@@ -453,20 +511,27 @@ def get_dashboard_summary(
         "output_tokens": int(output_tokens or 0),
         "cached_tokens": int(cached_tokens or 0),
         "reasoning_tokens": int(reasoning_tokens or 0),
-        "total_tokens": int(
-            (input_tokens or 0)
-            + (output_tokens or 0)
-            + (cached_tokens or 0)
-            + (reasoning_tokens or 0)
-        ),
+        # cached_tokens are a subset of input_tokens and reasoning_tokens
+        # are a subset of output_tokens; do not count them twice.
+        "total_tokens": int((input_tokens or 0) + (output_tokens or 0)),
         "total_cost": round(total_cost_float, 6),
         "failed_run_cost": round(failed_cost_float, 6),
+        "rejected_outcome_cost": round(rejected_run_cost, 6),
+        "waste_cost": round(waste_cost_float, 6),
         "waste_rate": (
-            round(failed_cost_float / total_cost_float, 4)
+            round(waste_cost_float / total_cost_float, 4)
             if total_cost_float
             else 0.0
         ),
         "successful_outcomes": successful_outcomes_float,
+        "time_saved_minutes": round(total_time_saved_minutes, 2),
+        "estimated_business_value": round(total_business_value, 6),
+        "net_effect": round(total_business_value - total_cost_float, 6),
+        "roi": (
+            round((total_business_value - total_cost_float) / total_cost_float, 4)
+            if total_cost_float
+            else None
+        ),
         "cost_per_successful_run": (
             round(total_cost_float / successful_runs, 6)
             if successful_runs

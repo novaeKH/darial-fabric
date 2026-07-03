@@ -1,16 +1,27 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import SessionSwitcher from "./SessionSwitcher";
-import { getCachedPermissions } from "./sessionApi";
-import { canAccessTab } from "./tabPermissions";
+import { getCachedPermissions, refreshCurrentSession } from "./sessionApi";
+import { canAccessTab, firstAccessibleTab } from "./tabPermissions";
 import {
   Activity,
   Bot,
+  Boxes,
+  Cable,
+  ChevronDown,
+  CircleDollarSign,
+  FileBarChart,
   FileText,
-  Shield,
-  GitBranch,
-  ScrollText,
+  Gauge,
+  History,
+  KeyRound,
+  LayoutDashboard,
+  MoreHorizontal,
   Play,
   RefreshCcw,
+  ScrollText,
+  ServerCog,
+  Shield,
+  ShieldAlert,
   AlertTriangle,
   CheckCircle2,
   Lock,
@@ -54,21 +65,23 @@ import ReportsView from "./ReportsView";
 import AccessView from "./AccessView";
 
 import KafkaDlqPanel from "./components/KafkaDlqPanel";
+import "./darialLightUi.css";
+
 
 const tabs = [
-  { id: "economics", label: "AI-экономика", icon: Activity },
-  { id: "ai-products", label: "AI-продукты", icon: Activity },
-  { id: "ai-agents", label: "Агенты", icon: Activity },
-  { id: "agent-runs", label: "Запуски", icon: Activity },
-  { id: "budgets", label: "Бюджеты", icon: Activity },
-  { id: "violations", label: "Нарушения", icon: Activity },
-  { id: "policies", label: "Политики", icon: Activity },
-  { id: "enterprise-policies", label: "Корп. политики", icon: Activity },
-  { id: "integrations", label: "Интеграции", icon: Activity },
-  { id: "reports", label: "Отчёты", icon: Activity },
-  { id: "dlq", label: "Kafka DLQ", icon: Activity },
-  { id: "access", label: "Доступы", icon: Activity },
-  { id: "audit", label: "Аудит", icon: Activity },
+  { id: "economics", label: "Обзор", icon: LayoutDashboard, primary: true },
+  { id: "ai-products", label: "Продукты", icon: Boxes, primary: true },
+  { id: "agent-runs", label: "Запуски", icon: Activity, primary: true },
+  { id: "budgets", label: "Экономика", icon: CircleDollarSign, primary: true },
+  { id: "violations", label: "Риски", icon: ShieldAlert, primary: true },
+  { id: "reports", label: "Отчёты", icon: FileBarChart, primary: true },
+  { id: "ai-agents", label: "Агенты", icon: Bot },
+  { id: "policies", label: "Политики", icon: ScrollText },
+  { id: "enterprise-policies", label: "Корпоративные правила", icon: Shield },
+  { id: "integrations", label: "Интеграции", icon: Cable },
+  { id: "dlq", label: "Инфраструктура", icon: ServerCog },
+  { id: "access", label: "Доступы", icon: KeyRound },
+  { id: "audit", label: "Аудит", icon: History },
 ];
 
 const statusLabels = {
@@ -328,7 +341,8 @@ function tRealtimeEvent(type) {
 }
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState("economics");
+  const [activeTab, setActiveTab] = useState(() => firstAccessibleTab(tabs, getCachedPermissions()));
+  const [moreOpen, setMoreOpen] = useState(false);
   const [rbacPermissions, setRbacPermissions] = useState(getCachedPermissions());
 
   const allowedTabs = tabs.filter((tab) =>
@@ -336,13 +350,33 @@ export default function App() {
   );
 
   useEffect(() => {
-    if (
-      allowedTabs.length > 0 &&
-      !allowedTabs.some((tab) => tab.id === activeTab)
-    ) {
-      setActiveTab(allowedTabs[0].id);
+    const nextTab = firstAccessibleTab(tabs, rbacPermissions);
+
+    if (!nextTab) {
+      if (activeTab !== null) setActiveTab(null);
+      return;
+    }
+
+    if (!allowedTabs.some((tab) => tab.id === activeTab)) {
+      setActiveTab(nextTab);
     }
   }, [rbacPermissions, activeTab]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    refreshCurrentSession()
+      .then(({ permissions }) => {
+        if (!cancelled) setRbacPermissions(permissions || []);
+      })
+      .catch(() => {
+        if (!cancelled) setRbacPermissions([]);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
 
 
@@ -544,73 +578,102 @@ export default function App() {
     }
   }
 
+  function handleRbacPermissionsChange(permissions) {
+    setRbacPermissions(Array.isArray(permissions) ? permissions : []);
+    setError(null);
+  }
+
   return (
     <div className="app-shell">
-      <aside className="sidebar">
-        <div className="brand">
-          <div className="brand-logo" aria-label="Darial logo">
-            <Shield size={30} strokeWidth={2.2} />
-          </div>
-          <div>
-            <div className="brand-title">Darial</div>
-            <div className="brand-subtitle">Центр управления корпоративными AI-системами</div>
+      <header className="app-header">
+        <div className="app-header-main">
+          <button className="brand brand-button" type="button" onClick={() => setActiveTab(firstAccessibleTab(tabs, rbacPermissions))}>
+            <div className="brand-logo" aria-label="Darial logo">
+              <Shield size={25} strokeWidth={2.2} />
+            </div>
+            <div>
+              <div className="brand-title">Darial</div>
+              <div className="brand-subtitle">AI Control Center</div>
+            </div>
+          </button>
+
+          <nav className="top-navigation" aria-label="Основная навигация">
+            {allowedTabs.filter((tab) => tab.primary).map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  className={`top-nav-item ${activeTab === tab.id ? "active" : ""}`}
+                  onClick={() => { setActiveTab(tab.id); setMoreOpen(false); }}
+                  type="button"
+                >
+                  <Icon size={17} />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
+
+            {allowedTabs.some((tab) => !tab.primary) && (
+              <div className="more-navigation">
+                <button
+                  type="button"
+                  className={`top-nav-item ${allowedTabs.some((tab) => !tab.primary && tab.id === activeTab) ? "active" : ""}`}
+                  onClick={() => setMoreOpen((value) => !value)}
+                >
+                  <MoreHorizontal size={17} />
+                  <span>Ещё</span>
+                  <ChevronDown size={14} />
+                </button>
+                {moreOpen && (
+                  <div className="more-navigation-menu">
+                    {allowedTabs.filter((tab) => !tab.primary).map((tab) => {
+                      const Icon = tab.icon;
+                      return (
+                        <button
+                          key={tab.id}
+                          type="button"
+                          className={activeTab === tab.id ? "active" : ""}
+                          onClick={() => { setActiveTab(tab.id); setMoreOpen(false); }}
+                        >
+                          <Icon size={17} />
+                          <span>{tab.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+          </nav>
+
+          <div className="header-utilities">
+            <div className={`system-status system-status-${realtimeStatus}`} title={lastRealtimeEvent ? `Последнее событие: ${tRealtimeEvent(lastRealtimeEvent.type)}` : "Ожидание событий"}>
+              <span className="realtime-dot" />
+              <span>{realtimeStatus === "connected" ? "Система работает" : tRealtimeStatus(realtimeStatus)}</span>
+            </div>
+            <SessionSwitcher onPermissionsChange={handleRbacPermissionsChange} />
           </div>
         </div>
-
-        <nav className="nav">
-          {allowedTabs.map((tab) => {
-            const Icon = tab.icon;
-            return (
-              <button
-                key={tab.id}
-                className={`nav-item ${activeTab === tab.id ? "active" : ""}`}
-                onClick={() => setActiveTab(tab.id)}
-              >
-                <Icon size={18} />
-                <span>{tab.label}</span>
-              </button>
-            );
-          })}
-        </nav>
-
-        <div className="sidebar-footer">
-          <Badge type={checklist?.ready_for_demo ? "success" : "warning"}>
-            {checklist?.ready_for_demo ? "Демо готово" : "Нужны данные"}
-          </Badge>
-        </div>
-        <SessionSwitcher onPermissionsChange={setRbacPermissions} />
-</aside>
+      </header>
 
       <main className="main">
-        <header className="topbar">
-          <div>
-            <h1>{tabs.find((t) => t.id === activeTab)?.label}</h1>
-            <p>
-              Darial объединяет наблюдаемость, затраты, эффективность и управление корпоративными AI-системами.
-            </p>
+        {!activeTab && (
+          <div className="alert alert-danger">
+            <Lock size={18} />
+            <span>Выберите активного пользователя с разрешениями Darial.</span>
           </div>
+        )}
 
-          <div className="topbar-actions">
-            <div className={`realtime-indicator realtime-${realtimeStatus}`}>
-              <span className="realtime-dot" />
-              <div>
-                <strong>{tRealtimeStatus(realtimeStatus)}</strong>
-                <span>
-                  {lastRealtimeEvent
-                    ? `Последнее событие: ${tRealtimeEvent(lastRealtimeEvent.type)}`
-                    : "Ожидание событий"}
-                </span>
-              </div>
+        {activeTab && activeTab !== "economics" && (
+          <header className="page-heading page-heading-simple">
+            <div>
+              <h1>{tabs.find((t) => t.id === activeTab)?.label}</h1>
+              <p>Управление корпоративными AI-системами в едином центре.</p>
             </div>
+          </header>
+        )}
 
-            <button className="btn btn-secondary" onClick={() => loadAll()} disabled={loading}>
-              <RefreshCcw size={16} />
-              Обновить
-            </button>
-          </div>
-        </header>
-
-        {error && (
+        {error && !String(error).includes("Choose a Darial principal") && (
           <div className="alert alert-danger">
             <AlertTriangle size={18} />
             <span>{typeof error === "string" ? error : JSON.stringify(error)}</span>

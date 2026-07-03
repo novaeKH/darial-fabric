@@ -25,7 +25,7 @@ export default function IngestionProcessorPanel({ onProcessed }) {
     [AlertCircle, "Не поддержано", summary.unsupported || 0],
   ];
   return <section className="proc-panel">
-    <div className="proc-head"><div><span>EVENT PROCESSOR</span><h3>Обработка телеметрии</h3><p>Преобразует события в runs, LLM calls, tool calls и business outcomes.</p></div>
+    <div className="proc-head"><div><span>ОБРАБОТЧИК СОБЫТИЙ</span><h3>Обработка телеметрии</h3><p>Преобразует события в запуски, LLM-вызовы, вызовы инструментов и бизнес-результаты.</p></div>
       <div className="proc-actions"><button onClick={load}><RefreshCcw size={15}/>Обновить</button><button className="proc-primary" onClick={process} disabled={busy || !summary.accepted}><Play size={15}/>{busy ? "Обработка…" : "Обработать события"}</button></div>
     </div>
     {message && <div className="proc-success">{message}</div>}{error && <div className="proc-error">{error}</div>}

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { principalFetch } from "../sessionApi";
+import KafkaDlqMetrics from "./KafkaDlqMetrics";
 
 type DlqEvent = {
   dlq_id: string;
@@ -116,6 +117,8 @@ export default function KafkaDlqPanel({ principalId }: Props) {
           Обновить
         </button>
       </div>
+
+      <KafkaDlqMetrics />
 
       <div className="dlq-filters">
         {[

@@ -1,64 +1,26 @@
-.session-switcher{position:relative;padding:12px}.session-current{display:grid;width:100%;grid-template-columns:auto 1fr auto;align-items:center;gap:9px;padding:9px;border:1px solid #293348;border-radius:12px;background:#161e2d;color:#fff;text-align:left;cursor:pointer}.session-avatar{display:grid;width:32px;height:32px;place-items:center;border-radius:9px;background:#29365a;color:#9c8fff}.session-current strong,.session-current span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.session-current strong{font-size:10px}.session-current span{margin-top:3px;color:#8e98ad;font-size:8px}.session-menu{position:absolute;z-index:1800;bottom:68px;left:12px;width:270px;overflow:hidden;border:1px solid #343d50;border-radius:13px;background:#171c28;box-shadow:0 20px 60px rgba(0,0,0,.35)}.session-menu>button{display:flex;width:100%;align-items:center;justify-content:space-between;gap:9px;padding:10px 12px;border:0;border-bottom:1px solid #252d3c;background:transparent;color:#fff;text-align:left;cursor:pointer}.session-menu>button:hover{background:#212838}.session-menu>button strong,.session-menu>button span{display:block}.session-menu>button strong{font-size:10px}.session-menu>button span{margin-top:3px;color:#8e98ad;font-size:8px}.session-menu .session-logout{justify-content:flex-start;color:#ff9ba6}
 
-/* Session menu fix */
-.session-switcher {
-  position: relative;
-  z-index: 2000;
-}
-
-.session-menu {
-  position: fixed !important;
-  left: 315px !important;
-  bottom: 24px !important;
-  width: 290px !important;
-  max-height: 420px !important;
-  overflow-y: auto !important;
-  z-index: 5000 !important;
-}
-
-@media (max-width: 850px) {
-  .session-menu {
-    left: 20px !important;
-    right: 20px !important;
-    bottom: 85px !important;
-    width: auto !important;
-  }
-}
-
-/* Fix: меню выбора пользователя поверх интерфейса */
-.session-switcher {
-  position: relative !important;
-  z-index: 10000 !important;
-  overflow: visible !important;
-}
-
-.session-current {
-  position: relative !important;
-  z-index: 10001 !important;
-}
-
-.session-menu {
-  display: block !important;
-  position: fixed !important;
-  left: 310px !important;
-  bottom: 22px !important;
-  width: 290px !important;
-  max-height: 430px !important;
-  overflow-y: auto !important;
-
-  z-index: 99999 !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  pointer-events: auto !important;
-
-  border: 1px solid #343d50 !important;
-  border-radius: 14px !important;
-  background: #171c28 !important;
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55) !important;
-}
-
-/* Родитель не должен обрезать выпадающее меню */
-.sidebar,
-.sidebar-footer {
-  overflow: visible !important;
-}
+.session-switcher{position:relative;flex:0 0 auto;z-index:120;font-family:inherit}
+.session-current{width:224px;height:44px;display:grid;grid-template-columns:32px minmax(0,1fr) 16px;align-items:center;gap:9px;padding:5px 10px;border:1px solid #dce3ee;border-radius:12px;background:#fff;color:#172033;cursor:pointer;text-align:left;box-shadow:0 4px 14px rgba(20,33,61,.06)}
+.session-current:hover{border-color:#bdc8d9;background:#fbfcff}.session-current:disabled{cursor:wait;opacity:.72}
+.session-avatar{width:32px;height:32px;display:grid;place-items:center;border-radius:9px;background:#eef0ff;color:#4f5ed7}
+.session-current>div:nth-child(2){min-width:0}
+.session-current strong,.session-current span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.session-current strong{color:#172033;font-size:12px;line-height:1.2;font-weight:800}
+.session-current span{margin-top:2px;color:#788399;font-size:9px;line-height:1.2}
+.session-current>svg{color:#7d8798;transition:transform .18s ease}.session-current[aria-expanded=true]>svg{transform:rotate(180deg)}
+.session-menu{position:absolute;top:calc(100% + 9px);right:0;width:300px;max-height:min(430px,calc(100vh - 110px));overflow-y:auto;padding:8px;border:1px solid #dfe5ef;border-radius:14px;background:#fff;box-shadow:0 18px 48px rgba(18,31,55,.2)}
+.session-menu-title{display:flex;align-items:center;gap:7px;padding:8px 9px 10px;color:#6e798d;font-size:10px;font-weight:900;letter-spacing:.06em;text-transform:uppercase}
+.session-menu>button{width:100%;min-height:52px;display:grid;grid-template-columns:minmax(0,1fr) 18px;align-items:center;gap:10px;padding:8px 10px;border:0;border-radius:10px;background:transparent;color:#172033;cursor:pointer;text-align:left}
+.session-menu>button:hover{background:#f3f5fb}.session-menu>button:disabled{cursor:wait;opacity:.65}
+.session-menu>button>div{min-width:0}.session-menu>button strong,.session-menu>button span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.session-menu>button strong{color:#172033;font-size:12px;font-weight:800}.session-menu>button span{margin-top:3px;color:#788399;font-size:10px}.session-menu>button>svg{color:#27a36a}
+.session-menu .session-logout{min-height:40px;display:flex;justify-content:flex-start;margin-top:7px;border-top:1px solid #edf0f5;border-radius:0 0 9px 9px;color:#b23d4b;font-size:11px;font-weight:800}
+.session-menu .session-logout svg{color:#b23d4b}
+.session-error{margin:7px 3px 3px;padding:8px 9px;border-radius:8px;background:#fff0f1;color:#a53543;font-size:10px;line-height:1.35}
+.app-header{overflow:visible!important}
+.app-header-main{min-height:76px;display:flex!important;align-items:center!important;gap:18px!important;overflow:visible!important}
+.top-navigation{min-width:0;flex:1 1 auto}
+.header-utilities{flex:0 0 auto;display:flex!important;align-items:center!important;justify-content:flex-end;gap:10px!important;min-width:0;position:relative;overflow:visible!important}
+@media(max-width:1250px){.session-current{width:184px}.session-current span{display:none}}
+@media(max-width:980px){.session-current{width:44px;grid-template-columns:32px;padding:5px}.session-current>div:nth-child(2),.session-current>svg{display:none}.session-menu{width:290px}}
+@media(max-width:720px){.session-menu{position:fixed;top:74px;left:12px;right:12px;width:auto;max-height:calc(100vh - 90px)}}

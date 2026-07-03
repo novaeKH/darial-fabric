@@ -166,7 +166,7 @@ export default function IntegrationsView() {
     <section className="int-page">
       <header className="int-hero">
         <div>
-          <div className="int-eyebrow">TELEMETRY INGESTION</div>
+          <div className="int-eyebrow">ПРИЁМ ТЕЛЕМЕТРИИ</div>
           <h2>Интеграции</h2>
           <p>
             Подключение AI-продуктов через SDK, HTTP API, Kafka или OpenTelemetry.

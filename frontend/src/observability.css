@@ -465,31 +465,7 @@
   .obs-donut-layout { align-items: flex-start; flex-direction: column; }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --obs-panel: #171b25;
-    --obs-border: #2b3140;
-    --obs-text: #eef1f8;
-    --obs-muted: #9ba4b8;
-  }
-  .obs-hero,
-  .obs-actions select,
-  .obs-actions button,
-  .obs-donut-center {
-    background-color: #171b25;
-    color: var(--obs-text);
-  }
-  .obs-stat,
-  .obs-panel { box-shadow: none; }
-  .obs-recommendation,
-  .obs-empty,
-  .obs-loading { background: #1d2230; }
-  .obs-recommendation-warning { background: #302618; }
-  .obs-grid-line,
-  .obs-table td,
-  .obs-table th { border-color: #2b3140; stroke: #2b3140; }
-  .obs-bar-track { background: #2a3040; }
-}
+
 
 /* Fix: контраст заголовка AI Economics */
 .obs-hero h2 {
@@ -498,15 +474,169 @@
   text-shadow: none !important;
 }
 
-@media (prefers-color-scheme: dark) {
-  .obs-hero h2 {
-    color: #f3f5fb !important;
-  }
-}
+
 
 /* Заголовок hero всегда тёмный, поскольку фон hero светлый */
 html .obs-hero h2 {
   color: #172033 !important;
   opacity: 1 !important;
   -webkit-text-fill-color: #172033 !important;
+}
+
+/* ===== Presentation dashboard polish ===== */
+.obs-page {
+  --obs-purple: #5865e8;
+  --obs-blue: #4773db;
+  --obs-cyan: #158b9f;
+  --obs-green: #23956a;
+  --obs-red: #d94d5c;
+  --obs-amber: #d98b24;
+  gap: 16px;
+}
+
+.obs-hero {
+  align-items: center;
+  padding: 20px 22px;
+  border-radius: 17px;
+  background: #ffffff;
+  box-shadow: none;
+}
+
+.obs-hero h2 {
+  font-size: clamp(21px, 2vw, 28px) !important;
+  -webkit-text-fill-color: #172033 !important;
+}
+
+.obs-eyebrow {
+  margin-bottom: 6px;
+  color: #5865e8;
+  font-size: 10px;
+}
+
+.obs-stats-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 13px;
+}
+
+.obs-stat {
+  padding: 18px 19px;
+  border-radius: 15px;
+  box-shadow: none;
+}
+
+.obs-stat-value {
+  font-size: clamp(22px, 2.1vw, 31px);
+}
+
+.obs-panel {
+  border-radius: 16px;
+  box-shadow: none;
+}
+
+.obs-main-grid {
+  grid-template-columns: minmax(0, 1.6fr) minmax(310px, 0.8fr);
+}
+
+.obs-table th {
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+@media (max-width: 1000px) {
+  .obs-stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .obs-main-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 620px) {
+  .obs-stats-grid { grid-template-columns: 1fr; }
+}
+
+/* ===== Demo presentation polish v2 ===== */
+.obs-page {
+  gap: 14px;
+}
+
+.obs-hero {
+  min-height: 112px;
+  padding: 20px 24px;
+  border: 1px solid #e3e8f1;
+  background:
+    linear-gradient(135deg, #ffffff 0%, #ffffff 62%, #f1f3ff 100%);
+}
+
+.obs-actions select,
+.obs-actions button {
+  min-height: 40px;
+  border-color: #dfe5ef;
+  background: #ffffff;
+}
+
+.obs-actions button {
+  color: #ffffff;
+  border-color: #20283a;
+  background: #20283a;
+}
+
+.obs-stats-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.obs-stat {
+  position: relative;
+  min-height: 142px;
+  padding: 18px 20px;
+  border: 1px solid #e3e8f1;
+  background: #ffffff !important;
+  color: #172033 !important;
+  box-shadow: 0 8px 24px rgba(35, 48, 78, 0.045);
+}
+
+.obs-stat-title,
+.obs-stat-subtitle {
+  color: #707a91 !important;
+}
+
+.obs-stat-value {
+  color: #172033 !important;
+}
+
+.obs-panel {
+  border-color: #e3e8f1;
+  background: #ffffff !important;
+  color: #172033 !important;
+}
+
+.obs-panel-header p,
+.obs-chart-labels,
+.obs-table td small {
+  color: #707a91 !important;
+}
+
+.obs-main-grid {
+  gap: 14px;
+}
+
+.obs-line-chart {
+  height: 220px;
+}
+
+.obs-donut-layout {
+  min-height: 220px;
+}
+
+.obs-recommendation {
+  border: 1px solid #edf0f5;
+  background: #f8f9fc;
+}
+
+.obs-recommendation-warning {
+  border-color: #f6dfb9;
+  background: #fff8ec;
+}
+
+@media (max-width: 1250px) {
+  .obs-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }

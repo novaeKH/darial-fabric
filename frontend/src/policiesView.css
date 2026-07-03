@@ -10,3 +10,12 @@
   background: #181e2b;
   font-size: 12px;
 }
+
+/* ===== DARIAL LIGHT UI V4 ===== */
+.pol-metric,.pol-card,.pol-modal,.pol-rule,.pol-empty,.pol-readonly-state{
+  background:#fff!important;color:#172033!important;border-color:#e3e8f1!important;
+  box-shadow:0 8px 24px rgba(35,48,78,.045)!important}
+.pol-rule,.pol-readonly-state{background:#f7f9fc!important;box-shadow:none!important}
+.pol-metric>span,.pol-metric>small,.pol-card p,.pol-scope,.pol-rule span{color:#707a91!important}
+.pol-metric>strong,.pol-card h3,.pol-rule strong{color:#172033!important}
+.pol-modal input,.pol-modal select,.pol-modal textarea{background:#fff!important;color:#172033!important;border-color:#dfe5ef!important}

@@ -1,9 +1,57 @@
-import argparse, uuid
+import argparse
+import os
+
 from darial_sdk import DarialClient
-p=argparse.ArgumentParser(); p.add_argument('--api-key',required=True); p.add_argument('--product-id',required=True); p.add_argument('--agent-name',default='Legal Contract Agent'); p.add_argument('--base-url',default='http://localhost:8000'); a=p.parse_args()
-c=DarialClient(a.base_url,a.api_key); t=f"real-demo-{uuid.uuid4()}"
-print(c.track_run(event_id=t+'-run',product_id=a.product_id,agent_name=a.agent_name,trace_id=t,payload={'workflow_name':'contract_review','environment':'prod','status':'completed','latency_ms':7600,'total_cost':1.84}))
-print(c.track_llm_call(event_id=t+'-llm',trace_id=t,model_name='qwen-72b-demo',provider='internal',input_tokens=4200,output_tokens=630,estimated_cost=1.71,latency_ms=6100))
-print(c.track_tool_call(event_id=t+'-tool',trace_id=t,tool_name='document_search',latency_ms=850,estimated_cost=.13))
-print(c.track_outcome(event_id=t+'-outcome',trace_id=t,outcome_type='contract_review_completed',success=True,quality_score=.94))
-print('Создан trace:',t)
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--api-key", default=os.getenv("DARIAL_API_KEY"))
+    parser.add_argument("--product-id", default=os.getenv("DARIAL_PRODUCT_ID"))
+    parser.add_argument(
+        "--agent-name",
+        default="Legal Contract Agent",
+    )
+    parser.add_argument(
+        "--base-url",
+        default=os.getenv("DARIAL_BASE_URL", "http://localhost:8000"),
+    )
+    args = parser.parse_args()
+
+    if not args.api_key:
+        raise SystemExit("Передай --api-key или DARIAL_API_KEY")
+
+    client = DarialClient(args.base_url, args.api_key, batch_size=10)
+
+    with client.run(
+        "contract_review",
+        agent_name=args.agent_name,
+        product_id=args.product_id,
+    ) as run:
+        run.record_tool_call(
+            tool_name="s3_document_reader",
+            latency_ms=180,
+        )
+        run.record_llm_call(
+            model_name="qwen-72b-demo",
+            provider="internal",
+            input_tokens=4200,
+            output_tokens=630,
+            estimated_cost=1.71,
+            latency_ms=6100,
+        )
+        run.record_outcome(
+            outcome_type="contract_review_completed",
+            success=True,
+            quality_score=0.94,
+            human_accepted=True,
+            time_saved_minutes=24,
+            estimated_business_value=850,
+        )
+
+    print("Demo telemetry отправлена")
+    print("trace_id:", run.trace_id)
+
+
+if __name__ == "__main__":
+    main()

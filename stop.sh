@@ -9,4 +9,5 @@ docker compose \
   -f docker-compose.kafka-outbox.yml \
   -f docker-compose.kafka-bridge.yml \
   -f docker-compose.kafka-dlq.yml \
+  -f docker-compose.kafka-health-history.yml \
   down

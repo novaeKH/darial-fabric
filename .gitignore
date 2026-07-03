@@ -14,3 +14,11 @@ coverage/
 .darial_stage*_backup_*/
 *.before_readonly_fix
 *.before_rbac_tabs
+
+# Local Darial backups and generated reports
+.darial_*_backup_*/
+.ui_backup_*/
+.ui_polish_*_backup_*/
+.mvp_*_backup_*/
+final_smoke_report.txt
+.darial_stage*_backup_*/

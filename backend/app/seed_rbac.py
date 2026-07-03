@@ -1,11 +1,8 @@
 from __future__ import annotations
 
 import uuid
-
 from sqlalchemy import text
-
 from app.core.database import SessionLocal
-
 
 PERMISSIONS = [
     ("platform.admin", "Полное управление платформой"),
@@ -35,57 +32,40 @@ ROLES = [
     {
         "code": "product_owner",
         "name": "Владелец AI-продукта",
-        "description": "Управление своим продуктом, агентами, runs и результатами.",
+        "description": "Продукты, агенты, запуски, экономика и отчёты.",
         "permissions": [
-            "products.read",
-            "products.manage",
-            "runs.read",
-            "economics.read",
-            "budgets.read",
-            "violations.read",
+            "products.read", "products.manage", "runs.read",
+            "economics.read", "budgets.read", "violations.read",
             "reports.read",
         ],
     },
     {
         "code": "finops",
         "name": "AI FinOps",
-        "description": "Экономика, бюджеты и управленческие отчёты.",
+        "description": "Расходы, бюджеты, запуски и управленческие отчёты.",
         "permissions": [
-            "products.read",
-            "runs.read",
-            "economics.read",
-            "budgets.read",
-            "budgets.manage",
-            "reports.read",
+            "products.read", "runs.read", "economics.read",
+            "budgets.read", "budgets.manage", "reports.read",
         ],
     },
     {
         "code": "security",
         "name": "Информационная безопасность",
-        "description": "Политики, нарушения, аудит и интеграции.",
+        "description": "Риски, политики, аудит и интеграции.",
         "permissions": [
-            "products.read",
-            "runs.read",
-            "policies.read",
-            "policies.manage",
-            "violations.read",
-            "violations.manage",
-            "integrations.manage",
-            "audit.read",
+            "products.read", "runs.read", "policies.read",
+            "policies.manage", "violations.read", "violations.manage",
+            "integrations.manage", "audit.read",
         ],
     },
     {
         "code": "auditor",
-        "name": "Аудитор",
-        "description": "Только чтение отчётов, политик, runs и аудита.",
+        "name": "Внешний аудитор",
+        "description": "Ограниченный read-only доступ: отчёты, риски, политики и аудит.",
         "permissions": [
-            "products.read",
-            "runs.read",
-            "economics.read",
-            "budgets.read",
-            "policies.read",
-            "violations.read",
             "reports.read",
+            "violations.read",
+            "policies.read",
             "audit.read",
         ],
     },
@@ -98,26 +78,19 @@ def main() -> None:
         ensure_tables(db)
 
         permission_ids = {}
-
         for code, name in PERMISSIONS:
             existing = db.execute(
                 text("SELECT id FROM rbac_permissions WHERE code=:code"),
                 {"code": code},
             ).scalar()
-
             permission_id = existing or str(uuid.uuid4())
-
             db.execute(
                 text("""
                     INSERT INTO rbac_permissions (id, code, name)
                     VALUES (:id, :code, :name)
                     ON CONFLICT (code) DO UPDATE SET name=EXCLUDED.name
                 """),
-                {
-                    "id": permission_id,
-                    "code": code,
-                    "name": name,
-                },
+                {"id": permission_id, "code": code, "name": name},
             )
             permission_ids[code] = db.execute(
                 text("SELECT id FROM rbac_permissions WHERE code=:code"),
@@ -129,17 +102,11 @@ def main() -> None:
                 text("SELECT id FROM rbac_roles WHERE code=:code"),
                 {"code": role["code"]},
             ).scalar()
-
             role_id = existing or str(uuid.uuid4())
-
             db.execute(
                 text("""
-                    INSERT INTO rbac_roles (
-                        id, code, name, description, is_system
-                    )
-                    VALUES (
-                        :id, :code, :name, :description, TRUE
-                    )
+                    INSERT INTO rbac_roles (id, code, name, description, is_system)
+                    VALUES (:id, :code, :name, :description, TRUE)
                     ON CONFLICT (code) DO UPDATE SET
                         name=EXCLUDED.name,
                         description=EXCLUDED.description
@@ -151,23 +118,20 @@ def main() -> None:
                     "description": role["description"],
                 },
             )
-
             role_id = db.execute(
                 text("SELECT id FROM rbac_roles WHERE code=:code"),
                 {"code": role["code"]},
             ).scalar_one()
 
+            # System role definitions are authoritative.
             db.execute(
                 text("DELETE FROM rbac_role_permissions WHERE role_id=:role_id"),
                 {"role_id": role_id},
             )
-
             for permission_code in role["permissions"]:
                 db.execute(
                     text("""
-                        INSERT INTO rbac_role_permissions (
-                            role_id, permission_id
-                        )
+                        INSERT INTO rbac_role_permissions (role_id, permission_id)
                         VALUES (:role_id, :permission_id)
                         ON CONFLICT DO NOTHING
                     """),
@@ -176,11 +140,10 @@ def main() -> None:
                         "permission_id": permission_ids[permission_code],
                     },
                 )
-
-            print(f"Role: {role['code']}")
+            print(f"Role synced: {role['code']} -> {len(role['permissions'])} permissions")
 
         db.commit()
-        print(f"Настроено ролей: {len(ROLES)}")
+        print(f"RBAC roles synchronized: {len(ROLES)}")
 
 
 if __name__ == "__main__":

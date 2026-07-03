@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Callable
+import re
 
 from fastapi import Request
 from fastapi.responses import JSONResponse
@@ -22,67 +23,26 @@ class RouteRule:
     write_permissions: tuple[str, ...] = ()
 
 
+# Most specific routes must be listed before broad prefixes.
 ROUTE_RULES: tuple[RouteRule, ...] = (
-    RouteRule(
-        "/api/observability/reports",
-        read_permissions=("reports.read", "platform.admin"),
-        write_permissions=("platform.admin",),
-    ),
-    RouteRule(
-        "/api/observability/budgets",
-        read_permissions=("budgets.read", "platform.admin"),
-        write_permissions=("budgets.manage", "platform.admin"),
-    ),
-    RouteRule(
-        "/api/budgets",
-        read_permissions=("budgets.read", "platform.admin"),
-        write_permissions=("budgets.manage", "platform.admin"),
-    ),
-    RouteRule(
-        "/api/observability/policies",
-        read_permissions=("policies.read", "platform.admin"),
-        write_permissions=("policies.manage", "platform.admin"),
-    ),
-    RouteRule(
-        "/api/observability/violations",
-        read_permissions=("violations.read", "platform.admin"),
-        write_permissions=("violations.manage", "platform.admin"),
-    ),
-    RouteRule(
-        "/api/ingestion",
-        read_permissions=("integrations.manage", "platform.admin"),
-        write_permissions=("integrations.manage", "platform.admin"),
-    ),
-    RouteRule(
-        "/api/rbac",
-        read_permissions=("rbac.manage", "platform.admin"),
-        write_permissions=("rbac.manage", "platform.admin"),
-    ),
-    RouteRule(
-        "/api/ai-products",
-        read_permissions=("products.read", "platform.admin"),
-        write_permissions=("platform.admin",),
-    ),
-    RouteRule(
-        "/api/agent-deployments",
-        read_permissions=("products.read", "platform.admin"),
-        write_permissions=("platform.admin",),
-    ),
-    RouteRule(
-        "/api/observability/runs",
-        read_permissions=("runs.read", "platform.admin"),
-        write_permissions=("platform.admin",),
-    ),
-    RouteRule(
-        "/api/observability/agents",
-        read_permissions=("runs.read", "platform.admin"),
-        write_permissions=("platform.admin",),
-    ),
-    RouteRule(
-        "/api/observability/audit",
-        read_permissions=("audit.read", "platform.admin"),
-        write_permissions=("platform.admin",),
-    ),
+    RouteRule("/api/observability/reports", ("reports.read", "platform.admin"), ("platform.admin",)),
+    RouteRule("/api/observability/dashboard", ("economics.read", "platform.admin"), ("platform.admin",)),
+    RouteRule("/api/observability/budgets", ("budgets.read", "platform.admin"), ("budgets.manage", "platform.admin")),
+    RouteRule("/api/budgets", ("budgets.read", "platform.admin"), ("budgets.manage", "platform.admin")),
+    RouteRule("/api/observability/policies", ("policies.read", "platform.admin"), ("policies.manage", "platform.admin")),
+    RouteRule("/api/enterprise-policies", ("policies.read", "platform.admin"), ("policies.manage", "platform.admin")),
+    RouteRule("/api/observability/violations", ("violations.read", "platform.admin"), ("violations.manage", "platform.admin")),
+    RouteRule("/api/observability/audit", ("audit.read", "platform.admin"), ("platform.admin",)),
+    RouteRule("/api/observability/runs", ("runs.read", "platform.admin"), ("platform.admin",)),
+    RouteRule("/api/observability/agents", ("runs.read", "platform.admin"), ("platform.admin",)),
+    RouteRule("/api/ai-products", ("products.read", "platform.admin"), ("products.manage", "platform.admin")),
+    RouteRule("/api/agent-deployments", ("products.read", "platform.admin"), ("products.manage", "platform.admin")),
+    RouteRule("/api/model-endpoints", ("products.read", "platform.admin"), ("products.manage", "platform.admin")),
+    RouteRule("/api/agents", ("products.read", "platform.admin"), ("products.manage", "platform.admin")),
+    RouteRule("/api/teams", ("products.read", "platform.admin"), ("platform.admin",)),
+    RouteRule("/api/ingestion", ("integrations.manage", "platform.admin"), ("integrations.manage", "platform.admin")),
+    RouteRule("/api/kafka", ("integrations.manage", "platform.admin"), ("integrations.manage", "platform.admin")),
+    RouteRule("/api/rbac", ("rbac.manage", "platform.admin"), ("rbac.manage", "platform.admin")),
 )
 
 
@@ -92,8 +52,13 @@ PUBLIC_PREFIXES = (
     "/openapi.json",
 )
 
-PUBLIC_EXACT_PREFIXES = (
-    "/api/rbac/principals",
+PUBLIC_WRITE_PATHS = {
+    "/api/ingestion/events",
+    "/api/ingestion/events/batch",
+}
+
+PERMISSIONS_LOOKUP_RE = re.compile(
+    r"^/api/rbac/principals/[^/]+/permissions$"
 )
 
 
@@ -101,31 +66,21 @@ def required_permissions(path: str, method: str) -> tuple[str, ...] | None:
     for rule in ROUTE_RULES:
         if not path.startswith(rule.prefix):
             continue
-
         if method in READ_METHODS:
             return rule.read_permissions or None
-
         if method in WRITE_METHODS:
             return rule.write_permissions or None
-
         return None
-
     return None
 
 
 def load_permissions(principal_id: str) -> set[str]:
     with SessionLocal() as db:
         ensure_tables(db)
-
         principal_status = db.execute(
-            text("""
-                SELECT status
-                FROM rbac_principals
-                WHERE id=:principal_id
-            """),
+            text("SELECT status FROM rbac_principals WHERE id=:principal_id"),
             {"principal_id": principal_id},
         ).scalar()
-
         if principal_status != "active":
             return set()
 
@@ -133,15 +88,12 @@ def load_permissions(principal_id: str) -> set[str]:
             text("""
                 SELECT DISTINCT p.code
                 FROM rbac_user_roles ur
-                JOIN rbac_role_permissions rp
-                  ON rp.role_id = ur.role_id
-                JOIN rbac_permissions p
-                  ON p.id = rp.permission_id
+                JOIN rbac_role_permissions rp ON rp.role_id = ur.role_id
+                JOIN rbac_permissions p ON p.id = rp.permission_id
                 WHERE ur.principal_id=:principal_id
             """),
             {"principal_id": principal_id},
         ).all()
-
         return {row[0] for row in rows}
 
 
@@ -149,13 +101,16 @@ def is_public_path(path: str, method: str) -> bool:
     if any(path.startswith(prefix) for prefix in PUBLIC_PREFIXES):
         return True
 
-    # Session switcher must be able to list principals and read permissions
-    # before the principal header is selected.
-    if method in READ_METHODS and any(
-        path.startswith(prefix) for prefix in PUBLIC_EXACT_PREFIXES
-    ):
+    # Demo login bootstrap: list principals and fetch exactly one principal's
+    # effective permissions. Other /api/rbac routes remain protected.
+    if method in READ_METHODS and path == "/api/rbac/principals":
+        return True
+    if method in READ_METHODS and PERMISSIONS_LOOKUP_RE.fullmatch(path):
         return True
 
+    # Telemetry uses deployment API keys, not an interactive principal.
+    if method == "POST" and path in PUBLIC_WRITE_PATHS:
+        return True
     return False
 
 
@@ -181,7 +136,6 @@ async def rbac_middleware(request: Request, call_next: Callable):
         )
 
     permissions = load_permissions(principal_id)
-
     if not permissions.intersection(required):
         return JSONResponse(
             status_code=403,

@@ -9,3 +9,14 @@
 .vrun-empty,.vrun-message{margin:22px 24px;padding:14px;border-radius:10px;background:#1b2130;color:#8f99ad;font-size:11px}.vrun-error{background:#4b252d;color:#ffb8c0}
 .viol-budget-details{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:13px}.viol-budget-details>div{padding:10px;border:1px solid #31394a;border-radius:10px;background:#202635}.viol-budget-details span,.viol-budget-details strong{display:block}.viol-budget-details span{color:#8e98ad;font-size:9px;text-transform:uppercase}.viol-budget-details strong{margin-top:5px;font-size:12px}.viol-over{color:#ff909c}
 @media(max-width:900px){.viol-budget-details{grid-template-columns:1fr 1fr}}
+
+/* ===== DARIAL LIGHT UI V4 ===== */
+.viol-metric,.viol-group,.viol-filters,.viol-empty,.vrun-drawer,.vrun-summary>div,.vrun-event,.vrun-empty,.vrun-message,.viol-budget-details>div{
+  background:#fff!important;color:#172033!important;border-color:#e3e8f1!important;
+  box-shadow:0 8px 24px rgba(35,48,78,.045)!important}
+.vrun-summary>div,.viol-budget-details>div,.vrun-event{background:#f7f9fc!important;box-shadow:none!important}
+.viol-metric>span,.viol-metric>small,.viol-meta,.vrun-summary span,.vrun-event span,.viol-budget-details span{color:#707a91!important}
+.viol-metric>strong,.viol-card h4,.vrun-summary strong,.vrun-event strong,.viol-budget-details strong{color:#172033!important}
+.viol-card,.viol-group-head,.vrun-event{border-color:#e3e8f1!important}
+.viol-filters select{background:#fff!important;color:#172033!important;border-color:#dfe5ef!important}
+.viol-secondary,.vrun-head button{background:#eef1f7!important;color:#172033!important;border-color:#dfe5ef!important}

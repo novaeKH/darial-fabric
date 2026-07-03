@@ -1541,3 +1541,813 @@ details summary {
   color: #dbe5f4;
 }
 
+
+
+/* Stage 14.2.3D2 — Kafka DLQ metrics */
+.dlq-metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.dlq-metric-cards {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.dlq-metric-card,
+.dlq-analytics-card,
+.dlq-metrics-loading {
+  border: 1px solid #d9e0ea;
+  background: #ffffff;
+  border-radius: 12px;
+}
+
+.dlq-metric-card {
+  padding: 16px;
+  min-width: 0;
+}
+
+.dlq-metric-card span {
+  display: block;
+  color: #667085;
+  font-size: 13px;
+}
+
+.dlq-metric-card strong {
+  display: block;
+  margin-top: 10px;
+  color: #101828;
+  font-size: 30px;
+  line-height: 1;
+}
+
+.dlq-metric-card small {
+  display: block;
+  margin-top: 8px;
+  color: #98a2b3;
+}
+
+.dlq-analytics-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(280px, 1fr);
+  gap: 12px;
+}
+
+.dlq-analytics-card {
+  padding: 16px;
+  min-height: 250px;
+}
+
+.dlq-analytics-title {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.dlq-analytics-title h3 {
+  margin: 0;
+  color: #101828;
+  font-size: 16px;
+}
+
+.dlq-analytics-title p {
+  margin: 4px 0 0;
+  color: #98a2b3;
+  font-size: 13px;
+}
+
+.dlq-analytics-title button {
+  border: 1px solid #d0d5dd;
+  background: #ffffff;
+  color: #344054;
+  border-radius: 8px;
+  padding: 7px 10px;
+  cursor: pointer;
+}
+
+.dlq-bars {
+  display: grid;
+  grid-template-columns: repeat(14, minmax(18px, 1fr));
+  align-items: end;
+  gap: 7px;
+  height: 180px;
+  margin-top: 20px;
+}
+
+.dlq-bar-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  height: 100%;
+}
+
+.dlq-bar-track {
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  height: 145px;
+  border-radius: 6px;
+  background: #f2f4f7;
+  overflow: hidden;
+}
+
+.dlq-bar-value {
+  width: 100%;
+  background: #5577e8;
+  border-radius: 6px 6px 0 0;
+  transition: height 180ms ease;
+}
+
+.dlq-bar-column span {
+  color: #98a2b3;
+  font-size: 10px;
+  transform: rotate(-38deg);
+  white-space: nowrap;
+}
+
+.dlq-error-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.dlq-error-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 12px;
+  border: 1px solid #eaecf0;
+  border-radius: 9px;
+  background: #f9fafb;
+}
+
+.dlq-error-item span {
+  display: block;
+  color: #344054;
+  font-size: 13px;
+  word-break: break-word;
+}
+
+.dlq-error-item small {
+  display: block;
+  margin-top: 4px;
+  color: #98a2b3;
+}
+
+.dlq-error-item strong {
+  color: #101828;
+}
+
+.dlq-metrics-loading {
+  padding: 20px;
+  color: #667085;
+}
+
+@media (max-width: 1350px) {
+  .dlq-metric-cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 980px) {
+  .dlq-metric-cards,
+  .dlq-analytics-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* Stage 14.2.4B — Kafka Pipeline Health */
+.kafka-health-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 18px;
+  padding: 18px;
+  border: 1px solid #d9e0ea;
+  border-left-width: 5px;
+  border-radius: 14px;
+  background: #ffffff;
+  color: #101828;
+}
+
+.kafka-health-healthy {
+  border-left-color: #12b76a;
+}
+
+.kafka-health-warning {
+  border-left-color: #f79009;
+}
+
+.kafka-health-critical {
+  border-left-color: #f04438;
+}
+
+.kafka-health-idle {
+  border-left-color: #98a2b3;
+}
+
+.kafka-health-header,
+.kafka-health-title-row,
+.kafka-health-footer,
+.kafka-health-signal {
+  display: flex;
+  align-items: center;
+}
+
+.kafka-health-header {
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.kafka-health-title-row {
+  gap: 9px;
+}
+
+.kafka-health-title-row h3 {
+  margin: 0;
+  color: #101828;
+  font-size: 17px;
+}
+
+.kafka-health-header p {
+  margin: 5px 0 0 24px;
+  color: #667085;
+  font-size: 13px;
+}
+
+.kafka-health-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #98a2b3;
+}
+
+.kafka-health-healthy .kafka-health-dot {
+  background: #12b76a;
+}
+
+.kafka-health-warning .kafka-health-dot {
+  background: #f79009;
+}
+
+.kafka-health-critical .kafka-health-dot {
+  background: #f04438;
+}
+
+.kafka-health-status {
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #f2f4f7;
+  color: #344054;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.kafka-health-critical .kafka-health-status {
+  background: #fef3f2;
+  color: #b42318;
+}
+
+.kafka-health-warning .kafka-health-status {
+  background: #fffaeb;
+  color: #b54708;
+}
+
+.kafka-health-healthy .kafka-health-status {
+  background: #ecfdf3;
+  color: #027a48;
+}
+
+.kafka-health-refresh {
+  border: 1px solid #d0d5dd;
+  background: #ffffff;
+  color: #344054;
+  border-radius: 8px;
+  padding: 8px 11px;
+  cursor: pointer;
+}
+
+.kafka-health-refresh:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.kafka-health-metrics {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.kafka-health-metrics article {
+  padding: 13px;
+  border: 1px solid #eaecf0;
+  border-radius: 10px;
+  background: #f9fafb;
+}
+
+.kafka-health-metrics span,
+.kafka-health-metrics small {
+  display: block;
+  color: #667085;
+}
+
+.kafka-health-metrics span {
+  font-size: 12px;
+}
+
+.kafka-health-metrics strong {
+  display: block;
+  margin-top: 7px;
+  color: #101828;
+  font-size: 24px;
+}
+
+.kafka-health-metrics small {
+  margin-top: 5px;
+  font-size: 11px;
+}
+
+.kafka-health-signals {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.kafka-health-signal {
+  justify-content: space-between;
+  gap: 14px;
+  padding: 11px 12px;
+  border: 1px solid #eaecf0;
+  border-radius: 9px;
+}
+
+.kafka-health-signal-critical {
+  border-color: #fecdca;
+  background: #fef3f2;
+}
+
+.kafka-health-signal-warning {
+  border-color: #fedf89;
+  background: #fffaeb;
+}
+
+.kafka-health-signal strong,
+.kafka-health-signal small {
+  display: block;
+}
+
+.kafka-health-signal strong {
+  color: #344054;
+  font-size: 13px;
+}
+
+.kafka-health-signal small {
+  margin-top: 3px;
+  color: #98a2b3;
+}
+
+.kafka-health-signal > span {
+  min-width: 34px;
+  color: #101828;
+  font-size: 18px;
+  font-weight: 700;
+  text-align: right;
+}
+
+.kafka-health-ok {
+  padding: 11px 12px;
+  border: 1px solid #abefc6;
+  border-radius: 9px;
+  background: #ecfdf3;
+  color: #027a48;
+}
+
+.kafka-health-footer {
+  justify-content: flex-end;
+  color: #98a2b3;
+  font-size: 11px;
+}
+
+.kafka-health-loading,
+.kafka-health-error {
+  color: #667085;
+}
+
+.kafka-health-error span {
+  display: block;
+}
+
+@media (max-width: 1180px) {
+  .kafka-health-metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .kafka-health-header {
+    align-items: flex-start;
+  }
+
+  .kafka-health-metrics {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== Darial presentation layout ===== */
+:root {
+  --darial-bg: #f5f7fb;
+  --darial-surface: #ffffff;
+  --darial-border: #e4e8f0;
+  --darial-text: #182033;
+  --darial-muted: #697386;
+  --darial-accent: #5865e8;
+  --darial-accent-soft: #eef0ff;
+}
+
+body {
+  background: var(--darial-bg);
+  color: var(--darial-text);
+}
+
+.app-shell {
+  min-height: 100vh;
+  display: block;
+  background: var(--darial-bg);
+}
+
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 1200;
+  border-bottom: 1px solid var(--darial-border);
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(18px);
+}
+
+.app-header-main {
+  display: flex;
+  min-height: 72px;
+  max-width: 1680px;
+  margin: 0 auto;
+  padding: 0 28px;
+  align-items: center;
+  gap: 24px;
+}
+
+.brand-button {
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--darial-text);
+  cursor: pointer;
+  text-align: left;
+}
+
+.brand-button .brand-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 13px;
+  background: linear-gradient(145deg, #6471ee, #4856d8);
+  box-shadow: 0 9px 22px rgba(88, 101, 232, 0.24);
+}
+
+.brand-button .brand-title {
+  font-size: 17px;
+  color: var(--darial-text);
+}
+
+.brand-button .brand-subtitle {
+  color: #8a93a5;
+  font-size: 10px;
+  letter-spacing: 0.02em;
+}
+
+.top-navigation {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  align-items: center;
+  gap: 4px;
+}
+
+.top-nav-item {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 13px;
+  border: 0;
+  border-radius: 11px;
+  background: transparent;
+  color: #596276;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.top-nav-item:hover {
+  background: #f2f4f8;
+  color: var(--darial-text);
+}
+
+.top-nav-item.active {
+  background: var(--darial-accent-soft);
+  color: var(--darial-accent);
+}
+
+.more-navigation {
+  position: relative;
+}
+
+.more-navigation-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 3000;
+  display: grid;
+  width: 250px;
+  padding: 8px;
+  border: 1px solid var(--darial-border);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 22px 55px rgba(29, 36, 57, 0.16);
+}
+
+.more-navigation-menu button {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 11px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: #4f596d;
+  cursor: pointer;
+  text-align: left;
+  font-weight: 650;
+}
+
+.more-navigation-menu button:hover,
+.more-navigation-menu button.active {
+  background: var(--darial-accent-soft);
+  color: var(--darial-accent);
+}
+
+.header-utilities {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.system-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 0 11px;
+  border: 1px solid #dce4df;
+  border-radius: 999px;
+  background: #f6fbf8;
+  color: #327454;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.system-status .realtime-dot {
+  width: 8px;
+  height: 8px;
+}
+
+.main {
+  width: 100%;
+  max-width: 1680px;
+  margin: 0 auto;
+  padding: 30px 36px 54px;
+  overflow: visible;
+}
+
+.page-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 20px;
+}
+
+.page-heading h1 {
+  margin: 0;
+  font-size: clamp(28px, 3vw, 38px);
+  letter-spacing: -0.045em;
+}
+
+.page-heading p {
+  margin: 7px 0 0;
+  color: var(--darial-muted);
+  font-size: 14px;
+}
+
+.compact-refresh {
+  min-height: 40px;
+  border-color: var(--darial-border) !important;
+  background: #fff !important;
+  color: var(--darial-text) !important;
+}
+
+.sidebar,
+.topbar {
+  display: none !important;
+}
+
+@media (max-width: 1280px) {
+  .app-header-main { gap: 14px; padding: 0 18px; }
+  .top-nav-item { padding: 0 9px; }
+  .top-nav-item span { display: none; }
+  .top-nav-item:last-child span { display: inline; }
+}
+
+@media (max-width: 760px) {
+  .app-header-main { min-height: auto; padding: 10px 14px; flex-wrap: wrap; }
+  .top-navigation { order: 3; width: 100%; overflow-x: auto; }
+  .top-nav-item span { display: inline; }
+  .header-utilities { margin-left: auto; }
+  .system-status { display: none; }
+  .main { padding: 22px 16px 40px; }
+  .page-heading { align-items: stretch; flex-direction: column; }
+  .compact-refresh { align-self: flex-start; }
+}
+
+
+/* ===== Global presentation polish v3 ===== */
+
+/* Shared page heading no longer carries an extra refresh action. */
+.page-heading-simple {
+  margin-bottom: 18px;
+}
+
+.page-heading-simple > div {
+  max-width: 900px;
+}
+
+/* Force a consistent light presentation across every product screen. */
+.app-shell,
+.main,
+.content-grid {
+  background: #f6f8fc;
+  color: #172033;
+}
+
+.panel,
+.stat-card,
+.summary-tile,
+.info-panel,
+.card,
+.metric-card,
+.product-card,
+.agent-card,
+.run-card,
+.budget-card,
+.policy-card,
+.violation-card,
+.integration-card,
+.report-card,
+.access-card,
+.audit-card,
+.dlq-metric-card,
+.dlq-analytics-card,
+.dlq-metrics-loading,
+.dlq-details,
+.dlq-table-wrap,
+[class$="-panel"]:not(.json-panel),
+[class$="-card"]:not(.status-card):not(.danger-card) {
+  background: #ffffff !important;
+  color: #172033 !important;
+  border-color: #e3e8f1 !important;
+  box-shadow: 0 8px 24px rgba(35, 48, 78, 0.045) !important;
+}
+
+.panel h1,
+.panel h2,
+.panel h3,
+.panel strong,
+.stat-card strong,
+.summary-tile strong,
+.dlq-table strong,
+.dlq-details h3,
+.dlq-details h4,
+[class$="-panel"] h2,
+[class$="-panel"] h3,
+[class$="-card"] strong {
+  color: #172033 !important;
+}
+
+.panel p,
+.panel small,
+.panel .muted,
+.stat-title,
+.stat-hint,
+.summary-tile span,
+.dlq-table small,
+.dlq-details small,
+.dlq-details dt,
+.dlq-empty-details,
+[class$="-panel"] p,
+[class$="-card"] p {
+  color: #707a91 !important;
+}
+
+/* Tables and filters should read as regular product UI, not a dark console. */
+table,
+thead,
+tbody,
+tr,
+th,
+td {
+  color: #172033;
+}
+
+th {
+  background: #f8f9fc;
+  color: #5f6980;
+}
+
+tbody tr:hover {
+  background: #f8faff;
+}
+
+input,
+select,
+textarea {
+  background: #ffffff !important;
+  color: #172033 !important;
+  border-color: #dfe5ef !important;
+}
+
+/* Keep code payloads dark, but lighten surrounding infrastructure UI. */
+.json-block,
+pre,
+code {
+  color-scheme: dark;
+}
+
+.dlq-table td,
+.dlq-details dd {
+  color: #334155 !important;
+}
+
+.dlq-filters button,
+.dlq-toolbar button,
+.dlq-actions button,
+.dlq-details-header button {
+  color: #334155 !important;
+  background: #ffffff !important;
+  border-color: #dfe5ef !important;
+}
+
+.dlq-filters button.active {
+  color: #3949d8 !important;
+  background: #eef0ff !important;
+  border-color: #cfd4ff !important;
+}
+
+.dlq-actions button:hover,
+.dlq-toolbar button:hover,
+.dlq-details-header button:hover {
+  background: #f5f7fb !important;
+}
+
+/* One refresh control per screen: local controls stay, shared header is title-only. */
+.compact-refresh {
+  display: none !important;
+}
+
+/* Slightly calmer spacing for presentation. */
+.main {
+  padding-top: 22px;
+}
+
+.page-heading {
+  align-items: flex-start;
+  padding: 0;
+}
+
+.page-heading h1 {
+  margin-bottom: 6px;
+}
+
+@media (max-width: 1100px) {
+  .main {
+    padding: 18px;
+  }
+}

@@ -149,8 +149,8 @@ function PolicyEditor({ onClose, onSaved }) {
           <label>Severity
             <select value={form.severity} onChange={(e) => setForm({ ...form, severity: e.target.value })}>
               <option value="info">Info</option>
-              <option value="warning">Warning</option>
-              <option value="critical">Critical</option>
+              <option value="warning">Предупреждение</option>
+              <option value="critical">Критично</option>
             </select>
           </label>
           <label>Режим
@@ -241,7 +241,7 @@ export default function PoliciesView() {
     <section className="pol-page">
       <header className="pol-hero">
         <div>
-          <div className="pol-eyebrow">AI POLICY ENGINE</div>
+          <div className="pol-eyebrow">ПОЛИТИКИ И ОГРАНИЧЕНИЯ</div>
           <h2>Политики и правила</h2>
           <p>
             Управляемые ограничения для стоимости, latency, моделей, инструментов,
@@ -251,7 +251,7 @@ export default function PoliciesView() {
         <div className="pol-actions">
           {hasPermission("policies.manage") && (
             <button type="button" onClick={evaluate} disabled={evaluating}>
-              <Activity size={16} />{evaluating ? "Проверка…" : "Проверить runs"}
+              <Activity size={16} />{evaluating ? "Проверка…" : "Проверить запуски"}
             </button>
           )}
           {hasPermission("policies.manage") && (

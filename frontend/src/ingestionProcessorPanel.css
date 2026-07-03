@@ -1,1 +1,8 @@
 .proc-panel{overflow:hidden;border:1px solid #2c3445;border-radius:18px;background:#171c28;color:#f4f6fc}.proc-head{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;padding:18px;border-bottom:1px solid #2c3445}.proc-head span{color:#8f83f4;font-size:10px;font-weight:900;letter-spacing:.1em}.proc-head h3{margin:5px 0 0}.proc-head p{margin:7px 0 0;color:#8e98ad;font-size:11px}.proc-actions{display:flex;gap:8px}.proc-actions button{display:inline-flex;align-items:center;gap:7px;min-height:38px;padding:0 12px;border:1px solid #343d50;border-radius:10px;background:#252c3a;color:#fff;font:inherit;font-weight:800}.proc-actions .proc-primary{border:0;background:#6758e8}.proc-actions button:disabled{opacity:.5}.proc-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:16px}.proc-stats>div{display:grid;grid-template-columns:auto 1fr;gap:4px 9px;padding:13px;border-radius:11px;background:#202635}.proc-stats svg{grid-row:1/3;color:#8f83f4}.proc-stats span{color:#8e98ad;font-size:10px}.proc-stats strong{font-size:17px}.proc-success,.proc-error{margin:14px 16px 0;padding:11px;border-radius:9px}.proc-success{background:#193b31;color:#72dfb7}.proc-error{background:#4b252d;color:#ffb0ba}@media(max-width:850px){.proc-head{align-items:flex-start;flex-direction:column}.proc-stats{grid-template-columns:1fr 1fr}}
+
+/* ===== DARIAL LIGHT UI V4 ===== */
+.proc-panel,.proc-stats>div{
+  background:#fff!important;color:#172033!important;border-color:#e3e8f1!important;
+  box-shadow:0 8px 24px rgba(35,48,78,.045)!important}
+.proc-stats>div{background:#f7f9fc!important;box-shadow:none!important}
+.proc-head p,.proc-stats span{color:#707a91!important}

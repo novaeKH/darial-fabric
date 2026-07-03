@@ -10,7 +10,8 @@ from sqlalchemy.orm import Session
 from app.api.ingestion_routes import ensure_tables
 from app.core.database import get_db
 from app.models.base import Agent
-from app.models.observability import AgentDeployment, AgentRun, BusinessOutcome, LLMCall, ToolCall
+from app.models.observability import AgentDeployment, AgentRun, BusinessOutcome, LLMCall, ModelEndpoint, ToolCall
+from app.services.economics_service import as_decimal, calculate_llm_cost_breakdown
 from app.services.clickhouse_telemetry import clickhouse_status, mirror_entity
 
 router = APIRouter(tags=["Telemetry Processor"])
@@ -66,7 +67,7 @@ def _process_run(db: Session, row: dict) -> str:
         environment=p.get("environment") or (dep.environment if dep else "prod"),
         status=p.get("status", "completed"), started_at=_dt(p.get("started_at")) or datetime.utcnow(),
         finished_at=_dt(p.get("finished_at")), latency_ms=p.get("latency_ms"),
-        request_count=int(p.get("request_count", 1)), total_cost=p.get("total_cost", 0),
+        request_count=0, total_cost=0,
         error_type=p.get("error_type"),
         metadata_json={**(p.get("metadata") or {}), "ingestion_event_id": row["event_id"]},
     )
@@ -74,29 +75,102 @@ def _process_run(db: Session, row: dict) -> str:
 
 
 def _process_llm(db: Session, row: dict) -> str:
-    p = row["payload_json"] or {}; run = _run(db, row.get("trace_id"), p)
-    if not run: raise ValueError("Связанный AgentRun не найден")
-    item = LLMCall(
-        id=str(uuid.uuid4()), run_id=run.id, provider=p.get("provider", "unknown"),
-        model_name=p.get("model_name", "unknown"), input_tokens=int(p.get("input_tokens", 0)),
-        output_tokens=int(p.get("output_tokens", 0)), cached_tokens=int(p.get("cached_tokens", 0)),
-        reasoning_tokens=int(p.get("reasoning_tokens", 0)), gpu_seconds=p.get("gpu_seconds"),
-        latency_ms=p.get("latency_ms"), status=p.get("status", "completed"),
-        token_source=p.get("token_source", "reported"), estimated_cost=p.get("estimated_cost", 0),
-        created_at=_dt(p.get("created_at")) or datetime.utcnow(),
+    p = row["payload_json"] or {}
+    run = _run(db, row.get("trace_id"), p)
+    if not run:
+        raise ValueError("Связанный AgentRun не найден")
+
+    provider = p.get("provider", "unknown")
+    model_name = p.get("model_name", "unknown")
+    event_time = _dt(p.get("created_at")) or datetime.utcnow()
+    endpoint = (
+        db.query(ModelEndpoint)
+        .filter(
+            ModelEndpoint.provider == provider,
+            ModelEndpoint.model_name == model_name,
+            ModelEndpoint.is_active.is_(True),
+            ModelEndpoint.valid_from <= event_time,
+            (ModelEndpoint.valid_to.is_(None) | (ModelEndpoint.valid_to >= event_time)),
+        )
+        .order_by(ModelEndpoint.valid_from.desc())
+        .first()
     )
-    db.add(item); db.flush(); return item.id
+
+    breakdown = (
+        calculate_llm_cost_breakdown(
+            input_tokens=int(p.get("input_tokens", 0)),
+            output_tokens=int(p.get("output_tokens", 0)),
+            cached_tokens=int(p.get("cached_tokens", 0)),
+            reasoning_tokens=int(p.get("reasoning_tokens", 0)),
+            gpu_seconds=float(p.get("gpu_seconds") or 0),
+            endpoint=endpoint,
+        )
+        if endpoint
+        else None
+    )
+    estimated_cost = breakdown.total_cost if breakdown else as_decimal(0)
+    metadata = dict(p.get("metadata") or {})
+    metadata["cost_provenance"] = (
+        breakdown.as_metadata()
+        if breakdown
+        else {
+            "pricing_method": "not_calculated",
+            "reason": "active_tariff_not_found",
+            "provider": provider,
+            "model": model_name,
+        }
+    )
+
+    item = LLMCall(
+        id=str(uuid.uuid4()),
+        run_id=run.id,
+        model_endpoint_id=endpoint.id if endpoint else None,
+        provider=provider,
+        model_name=model_name,
+        input_tokens=int(p.get("input_tokens", 0)),
+        output_tokens=int(p.get("output_tokens", 0)),
+        cached_tokens=int(p.get("cached_tokens", 0)),
+        reasoning_tokens=int(p.get("reasoning_tokens", 0)),
+        gpu_seconds=p.get("gpu_seconds"),
+        latency_ms=p.get("latency_ms"),
+        status=p.get("status", "completed"),
+        token_source=p.get("token_source", "reported"),
+        estimated_cost=estimated_cost,
+        metadata_json=metadata,
+        created_at=event_time,
+    )
+    db.add(item)
+    run.request_count = int(run.request_count or 0) + 1
+    run.total_cost = as_decimal(run.total_cost) + estimated_cost
+    db.flush()
+    return item.id
 
 
 def _process_tool(db: Session, row: dict) -> str:
-    p = row["payload_json"] or {}; run = _run(db, row.get("trace_id"), p)
-    if not run: raise ValueError("Связанный AgentRun не найден")
+    p = row["payload_json"] or {}
+    run = _run(db, row.get("trace_id"), p)
+    if not run:
+        raise ValueError("Связанный AgentRun не найден")
+    reported_cost = as_decimal(p.get("estimated_cost", 0))
+    metadata = dict(p.get("metadata") or {})
+    metadata["cost_provenance"] = {
+        "pricing_method": "reported_by_integration",
+        "verified": False,
+    }
     item = ToolCall(
-        id=str(uuid.uuid4()), run_id=run.id, tool_name=p.get("tool_name", "unknown"),
-        status=p.get("status", "completed"), latency_ms=p.get("latency_ms"),
-        estimated_cost=p.get("estimated_cost", 0), created_at=_dt(p.get("created_at")) or datetime.utcnow(),
+        id=str(uuid.uuid4()),
+        run_id=run.id,
+        tool_name=p.get("tool_name", "unknown"),
+        status=p.get("status", "completed"),
+        latency_ms=p.get("latency_ms"),
+        estimated_cost=reported_cost,
+        metadata_json=metadata,
+        created_at=_dt(p.get("created_at")) or datetime.utcnow(),
     )
-    db.add(item); db.flush(); return item.id
+    db.add(item)
+    run.total_cost = as_decimal(run.total_cost) + reported_cost
+    db.flush()
+    return item.id
 
 
 def _process_outcome(db: Session, row: dict) -> str:

@@ -87,7 +87,9 @@ def get_agents_summary(db: Session = Depends(get_db)):
         )
 
         total_runs = len(agent_runs)
-        total_tokens = input_tokens + output_tokens + cached_tokens + reasoning_tokens
+        # cached_tokens are included in input_tokens and reasoning_tokens are
+        # included in output_tokens. Do not count the subsets twice.
+        total_tokens = input_tokens + output_tokens
 
         result.append(
             {
@@ -154,28 +156,92 @@ def get_run_details(
     outcomes = db.query(BusinessOutcome).filter(BusinessOutcome.run_id == run.id).order_by(BusinessOutcome.created_at).all()
     violations = db.query(PolicyViolation).filter(PolicyViolation.run_id == run.id).order_by(PolicyViolation.detected_at).all()
 
+    def metadata(item) -> dict[str, Any]:
+        value = getattr(item, "metadata_json", None)
+        return value if isinstance(value, dict) else {}
+
+    def integer_meta(meta: dict[str, Any], *keys: str) -> int:
+        for key in keys:
+            try:
+                if meta.get(key) is not None:
+                    return max(int(meta[key]), 0)
+            except (TypeError, ValueError):
+                pass
+        return 0
+
     def serialize_llm(item: LLMCall):
+        item_meta = metadata(item)
+        input_tokens = int(item.input_tokens or 0)
+        output_tokens = int(item.output_tokens or 0)
+        cached_tokens = int(item.cached_tokens or 0)
+        reasoning_tokens = int(item.reasoning_tokens or 0)
+        provenance = item_meta.get("cost_provenance") or {}
         return {
             "id": item.id,
             "provider": item.provider,
             "model_name": item.model_name,
-            "input_tokens": item.input_tokens,
-            "output_tokens": item.output_tokens,
-            "cached_tokens": item.cached_tokens,
-            "reasoning_tokens": item.reasoning_tokens,
-            "total_tokens": (
-                int(item.input_tokens or 0)
-                + int(item.output_tokens or 0)
-                + int(item.cached_tokens or 0)
-                + int(item.reasoning_tokens or 0)
-            ),
+            "model_endpoint_id": item.model_endpoint_id,
+            "input_tokens": input_tokens,
+            "output_tokens": output_tokens,
+            "cached_tokens": cached_tokens,
+            "reasoning_tokens": reasoning_tokens,
+            "total_tokens": input_tokens + output_tokens,
             "gpu_seconds": item.gpu_seconds,
             "latency_ms": item.latency_ms,
             "status": item.status,
             "token_source": enum_value(item.token_source),
             "estimated_cost": float(item.estimated_cost or 0),
+            "retry_count": integer_meta(item_meta, "retry_count", "retries", "attempts"),
+            "cost_provenance": provenance,
+            "metadata_json": item_meta,
             "created_at": item.created_at,
         }
+
+    serialized_llm = [serialize_llm(item) for item in llm_calls]
+    serialized_tools = []
+    for item in tool_calls:
+        item_meta = metadata(item)
+        serialized_tools.append({
+            "id": item.id,
+            "tool_name": item.tool_name,
+            "status": item.status,
+            "latency_ms": item.latency_ms,
+            "estimated_cost": float(item.estimated_cost or 0),
+            "retry_count": integer_meta(item_meta, "retry_count", "retries", "attempts"),
+            "cost_provenance": item_meta.get("cost_provenance") or {},
+            "metadata_json": item_meta,
+            "created_at": item.created_at,
+        })
+
+    serialized_outcomes = [{
+        "id": item.id,
+        "outcome_type": item.outcome_type,
+        "success": item.success,
+        "quantity": float(item.quantity or 0),
+        "quality_score": item.quality_score,
+        "human_accepted": item.human_accepted,
+        "time_saved_minutes": item.time_saved_minutes,
+        "estimated_business_value": float(item.estimated_business_value) if item.estimated_business_value is not None else None,
+        "metadata_json": metadata(item),
+        "created_at": item.created_at,
+    } for item in outcomes]
+
+    input_tokens = sum(item["input_tokens"] for item in serialized_llm)
+    output_tokens = sum(item["output_tokens"] for item in serialized_llm)
+    cached_tokens = sum(item["cached_tokens"] for item in serialized_llm)
+    reasoning_tokens = sum(item["reasoning_tokens"] for item in serialized_llm)
+    llm_cost = sum(item["estimated_cost"] for item in serialized_llm)
+    tool_cost = sum(item["estimated_cost"] for item in serialized_tools)
+    retry_count = (
+        integer_meta(metadata(run), "retry_count", "retries", "attempts")
+        + sum(item["retry_count"] for item in serialized_llm)
+        + sum(item["retry_count"] for item in serialized_tools)
+    )
+    outcome_quantity = sum(item["quantity"] for item in serialized_outcomes if item["success"] and item["human_accepted"] is not False)
+    business_value = sum(float(item["estimated_business_value"] or 0) for item in serialized_outcomes if item["success"] and item["human_accepted"] is not False)
+    time_saved_minutes = sum(float(item["time_saved_minutes"] or 0) for item in serialized_outcomes if item["success"] and item["human_accepted"] is not False)
+    run_cost = float(run.total_cost or 0)
+    observed_components_cost = llm_cost + tool_cost
 
     return {
         "run": {
@@ -188,19 +254,12 @@ def get_run_details(
             "finished_at": run.finished_at,
             "latency_ms": run.latency_ms,
             "request_count": run.request_count,
-            "total_cost": float(run.total_cost or 0),
+            "total_cost": run_cost,
             "error_type": run.error_type,
-            "metadata_json": run.metadata_json,
+            "metadata_json": metadata(run),
         },
-        "product": {
-            "id": product.id,
-            "name": product.name,
-        } if product else None,
-        "agent": {
-            "id": agent.id,
-            "name": agent.name,
-            "status": agent.status,
-        } if agent else None,
+        "product": {"id": product.id, "name": product.name} if product else None,
+        "agent": {"id": agent.id, "name": agent.name, "status": agent.status} if agent else None,
         "deployment": {
             "id": deployment.id,
             "version": deployment.version,
@@ -210,45 +269,42 @@ def get_run_details(
             "service_name": deployment.service_name,
             "framework": deployment.framework,
         } if deployment else None,
-        "llm_calls": [serialize_llm(item) for item in llm_calls],
-        "tool_calls": [
-            {
-                "id": item.id,
-                "tool_name": item.tool_name,
-                "status": item.status,
-                "latency_ms": item.latency_ms,
-                "estimated_cost": float(item.estimated_cost or 0),
-                "created_at": item.created_at,
-            }
-            for item in tool_calls
-        ],
-        "outcomes": [
-            {
-                "id": item.id,
-                "outcome_type": item.outcome_type,
-                "success": item.success,
-                "quantity": item.quantity,
-                "quality_score": item.quality_score,
-                "human_accepted": item.human_accepted,
-                "time_saved_minutes": item.time_saved_minutes,
-                "estimated_business_value": (
-                    float(item.estimated_business_value)
-                    if item.estimated_business_value is not None
-                    else None
-                ),
-                "created_at": item.created_at,
-            }
-            for item in outcomes
-        ],
-        "violations": [
-            {
-                "id": item.id,
-                "policy_code": item.policy_code,
-                "severity": item.severity,
-                "description": item.description,
-                "status": enum_value(item.status),
-                "detected_at": item.detected_at,
-            }
-            for item in violations
-        ],
+        "summary": {
+            "llm_calls": len(serialized_llm),
+            "tool_calls": len(serialized_tools),
+            "input_tokens": input_tokens,
+            "output_tokens": output_tokens,
+            "cached_tokens": cached_tokens,
+            "reasoning_tokens": reasoning_tokens,
+            "total_tokens": input_tokens + output_tokens,
+            "llm_cost": round(llm_cost, 6),
+            "tool_cost": round(tool_cost, 6),
+            "run_cost": round(run_cost, 6),
+            "unattributed_cost": round(max(run_cost - observed_components_cost, 0), 6),
+            "retry_count": retry_count,
+            "successful_outcome_quantity": outcome_quantity,
+            "time_saved_minutes": round(time_saved_minutes, 2),
+            "estimated_business_value": round(business_value, 6),
+            "net_effect": round(business_value - run_cost, 6),
+            "roi": round((business_value - run_cost) / run_cost, 4) if run_cost > 0 else None,
+        },
+        "calculation_policy": {
+            "total_tokens": "input_tokens + output_tokens",
+            "cached_tokens_are_subset_of_input": True,
+            "reasoning_tokens_are_subset_of_output": True,
+            "business_value_is_estimate": True,
+            "tool_cost_may_be_reported_by_integration": True,
+        },
+        "llm_calls": serialized_llm,
+        "tool_calls": serialized_tools,
+        "outcomes": serialized_outcomes,
+        "violations": [{
+            "id": item.id,
+            "policy_code": item.policy_code,
+            "severity": enum_value(item.severity),
+            "description": item.description,
+            "status": enum_value(item.status),
+            "detected_at": item.detected_at,
+        } for item in violations],
     }
+

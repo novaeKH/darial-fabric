@@ -189,7 +189,7 @@ export default function AccessView() {
     <section className="acc-page">
       <header className="acc-hero">
         <div>
-          <div className="acc-eyebrow">IDENTITY & ACCESS</div>
+          <div className="acc-eyebrow">ПОЛЬЗОВАТЕЛИ И ДОСТУПЫ</div>
           <h2>Пользователи и роли</h2>
           <p>
             Разграничение доступа к AI-продуктам, экономике, политикам,

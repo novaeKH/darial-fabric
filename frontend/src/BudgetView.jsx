@@ -164,7 +164,7 @@ export default function BudgetView() {
     <section className="budget-page">
       <header className="budget-hero">
         <div>
-          <div className="budget-eyebrow">AI FINOPS</div>
+          <div className="budget-eyebrow">УПРАВЛЕНИЕ РАСХОДАМИ</div>
           <h2>Бюджеты и лимиты</h2>
           <p>Фактические расходы, прогноз до конца месяца и автоматические предупреждения по AI-продуктам.</p>
         </div>

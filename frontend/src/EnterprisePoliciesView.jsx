@@ -91,8 +91,8 @@ function CustomPolicyModal({ onClose, onSaved }) {
           <label>Severity
             <select value={form.severity} onChange={(e) => setForm({ ...form, severity: e.target.value })}>
               <option value="info">Info</option>
-              <option value="warning">Warning</option>
-              <option value="critical">Critical</option>
+              <option value="warning">Предупреждение</option>
+              <option value="critical">Критично</option>
             </select>
           </label>
           <label>Режим
@@ -161,7 +161,7 @@ export default function EnterprisePoliciesView() {
     <section className="epol-page">
       <header className="epol-hero">
         <div>
-          <div className="epol-eyebrow">ENTERPRISE POLICY MANAGEMENT</div>
+          <div className="epol-eyebrow">КОРПОРАТИВНЫЕ ПОЛИТИКИ</div>
           <h2>Корпоративные политики</h2>
           <p>
             Импорт существующих правил компании, экспорт в Git-friendly формат,

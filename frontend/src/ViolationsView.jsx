@@ -141,7 +141,7 @@ export default function ViolationsView() {
     <section className="viol-page">
       <header className="viol-hero">
         <div>
-          <div className="viol-eyebrow">AI GOVERNANCE</div>
+          <div className="viol-eyebrow">КОНТРОЛЬ РИСКОВ</div>
           <h2>Нарушения и предупреждения</h2>
           <p>
             Бюджетные риски, excessive retries, аномальные расходы и другие

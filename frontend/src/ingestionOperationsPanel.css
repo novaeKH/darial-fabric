@@ -10,3 +10,10 @@
 .ops-list article{display:grid;grid-template-columns:1fr 1.5fr auto auto;align-items:center;gap:12px;padding:13px 16px;border-top:1px solid #272f3f}
 .ops-list strong,.ops-list span{display:block}.ops-list strong{font-size:11px}.ops-list span,.ops-list time{margin-top:3px;color:#8e98ad;font-size:9px}.ops-list button{padding:8px 10px}
 @media(max-width:1000px){.ops-stats{grid-template-columns:1fr 1fr}.ops-list article{grid-template-columns:1fr}.ops-list time{margin-top:0}}
+
+/* ===== DARIAL LIGHT UI V4 ===== */
+.ops-panel,.ops-stats>div,.ops-dead,.ops-list article{
+  background:#fff!important;color:#172033!important;border-color:#e3e8f1!important;
+  box-shadow:0 8px 24px rgba(35,48,78,.045)!important}
+.ops-stats>div,.ops-list article{background:#f7f9fc!important;box-shadow:none!important}
+.ops-panel p,.ops-stats span,.ops-list span{color:#707a91!important}

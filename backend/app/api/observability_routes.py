@@ -1,11 +1,12 @@
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, Query
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.core.auth import AuthenticatedAgent, require_agent_api_key
 from app.core.database import get_db
-from app.models.observability import AIProduct, AgentDeployment, AgentRun, ModelEndpoint
+from app.models.observability import AIProduct, AgentDeployment, AgentRun, LLMCall, ModelEndpoint
 from app.schemas.observability import (
     AIProductCreate,
     AIProductRead,
@@ -209,7 +210,28 @@ def list_agent_runs(
     if product_id:
         ensure_product_access(scope, product_id)
 
-    query = db.query(AgentRun)
+    token_totals = (
+        db.query(
+            LLMCall.run_id.label("run_id"),
+            func.coalesce(func.sum(LLMCall.input_tokens), 0).label("input_tokens"),
+            func.coalesce(func.sum(LLMCall.output_tokens), 0).label("output_tokens"),
+            func.coalesce(func.sum(LLMCall.cached_tokens), 0).label("cached_tokens"),
+            func.coalesce(func.sum(LLMCall.reasoning_tokens), 0).label("reasoning_tokens"),
+        )
+        .group_by(LLMCall.run_id)
+        .subquery()
+    )
+
+    query = (
+        db.query(
+            AgentRun,
+            func.coalesce(token_totals.c.input_tokens, 0).label("input_tokens"),
+            func.coalesce(token_totals.c.output_tokens, 0).label("output_tokens"),
+            func.coalesce(token_totals.c.cached_tokens, 0).label("cached_tokens"),
+            func.coalesce(token_totals.c.reasoning_tokens, 0).label("reasoning_tokens"),
+        )
+        .outerjoin(token_totals, token_totals.c.run_id == AgentRun.id)
+    )
 
     if not scope.organization_wide:
         query = query.filter(AgentRun.product_id.in_(scope.product_ids))
@@ -221,7 +243,27 @@ def list_agent_runs(
     if status:
         query = query.filter(AgentRun.status == status)
 
-    return query.order_by(AgentRun.created_at.desc()).limit(limit).all()
+    rows = query.order_by(AgentRun.created_at.desc()).limit(limit).all()
+    result: list[AgentRunRead] = []
+
+    for run, input_tokens, output_tokens, cached_tokens, reasoning_tokens in rows:
+        # cached_tokens are a subset of input_tokens; reasoning_tokens are a
+        # subset of output_tokens, so total_tokens must not count them twice.
+        run_data = AgentRunRead.model_validate(run).model_dump()
+        run_data.update(
+            {
+                "input_tokens": int(input_tokens or 0),
+                "output_tokens": int(output_tokens or 0),
+                "cached_tokens": int(cached_tokens or 0),
+                "reasoning_tokens": int(reasoning_tokens or 0),
+                "total_tokens": int(
+                    (input_tokens or 0) + (output_tokens or 0)
+                ),
+            }
+        )
+        result.append(AgentRunRead(**run_data))
+
+    return result
 
 
 @router.get("/observability/dashboard/summary", response_model=DashboardSummary)

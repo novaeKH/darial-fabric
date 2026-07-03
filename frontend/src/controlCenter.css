@@ -176,3 +176,16 @@
   color: #8f99ad;
   font-size: 11px;
 }
+
+/* ===== DARIAL LIGHT UI V4 ===== */
+.cc-metric,.cc-product-card,.cc-table-card,.cc-detail-section,.cc-event,.cc-empty-row{
+  background:#fff!important;color:#172033!important;border-color:#e3e8f1!important;
+  box-shadow:0 8px 24px rgba(35,48,78,.045)!important}
+.cc-card-stats>div,.cc-detail-grid>div{background:#f7f9fc!important;color:#172033!important;border:1px solid #e9edf4!important}
+.cc-card-stats span,.cc-detail-grid span,.cc-card-footer,.cc-metric-label,.cc-metric small,.cc-table small,.cc-event span,.cc-empty-row{color:#707a91!important}
+.cc-card-stats strong,.cc-detail-grid strong,.cc-product-card h3,.cc-table td,.cc-table th,.cc-event strong{color:#172033!important}
+.cc-table th{background:#f7f9fc!important}.cc-table tr:hover td{background:#fafbff!important}
+.cc-drawer{background:#fff!important;color:#172033!important}
+.cc-drawer-head,.cc-detail-section,.cc-event{border-color:#e3e8f1!important}
+
+.cc-header-actions{display:flex;align-items:center;gap:9px}.cc-header .cc-primary-action{border-color:#5458e8!important;background:#5458e8!important;color:#fff!important}.cc-header .cc-primary-action:hover{background:#474bcf!important}@media(max-width:760px){.cc-header-actions{width:100%;flex-wrap:wrap}.cc-header-actions button{flex:1}}

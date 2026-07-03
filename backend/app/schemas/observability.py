@@ -118,6 +118,14 @@ class AgentRunRead(BaseModel):
     latency_ms: int | None
     request_count: int
     total_cost: float
+
+    # Aggregated from related LLMCall rows for list/dashboard views.
+    input_tokens: int = 0
+    output_tokens: int = 0
+    cached_tokens: int = 0
+    reasoning_tokens: int = 0
+    total_tokens: int = 0
+
     error_type: str | None
     metadata_json: dict[str, Any] | None
     created_at: datetime
