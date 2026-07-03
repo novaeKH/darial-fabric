@@ -1,0 +1,57 @@
+.DS_Store
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+.venv/
+venv/
+node_modules/
+dist/
+coverage/
+
+# Darial local patch backups
+.darial_stage*_backup_*/
+*.before_readonly_fix
+*.before_rbac_tabs
+
+# Local Darial backups and generated reports
+.darial_*_backup_*/
+.ui_backup_*/
+.ui_polish_*_backup_*/
+.mvp_*_backup_*/
+final_smoke_report.txt
+.darial_stage*_backup_*/
+
+# Darial local backups and generated files
+.mvp_*_backup_*/
+.darial_*_backup_*/
+.ui_*_backup_*/
+final_smoke_report.txt
+.DS_Store
+__pycache__/
+*.pyc
+
+# Secrets and local environment
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+.venv/
+venv/
+
+# Generated files
+__pycache__/
+*.pyc
+*.log
+*.dump
+.DS_Store
+
+# Local data and backups
+backups/
+.mvp_*_backup_*/
+.darial_*_backup_*/
+.ui_*_backup_*/
+final_smoke_report.txt

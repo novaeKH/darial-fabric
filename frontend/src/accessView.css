@@ -1,0 +1,92 @@
+.acc-page{display:grid;gap:18px}.acc-hero{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;padding:27px;border:1px solid #30384a;border-radius:20px;background:linear-gradient(135deg,#fff,#f3f0ff);color:#172033}.acc-hero h2{margin:4px 0 0;color:#172033!important;font-size:clamp(28px,4vw,42px);letter-spacing:-.045em;-webkit-text-fill-color:#172033!important}.acc-hero p{max-width:820px;margin:8px 0 0;color:#758099}.acc-eyebrow{color:#6758e8;font-size:12px;font-weight:900;letter-spacing:.1em}.acc-actions{display:flex;gap:8px;flex-wrap:wrap}.acc-actions button{display:inline-flex;min-height:42px;align-items:center;gap:7px;padding:0 13px;border:0;border-radius:11px;background:#171c28;color:#fff;font:inherit;font-weight:800;cursor:pointer}.acc-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.acc-metric,.acc-panel{border:1px solid #2c3445;border-radius:18px;background:#171c28;color:#f4f6fc}.acc-metric{padding:18px}.acc-metric-icon{display:grid;width:38px;height:38px;margin-bottom:16px;place-items:center;border-radius:11px;background:#eeecff;color:#6758e8}.acc-tone-blue .acc-metric-icon{background:#e8f0ff;color:#3974e8}.acc-tone-green .acc-metric-icon{background:#e5f7ef;color:#1d9c6c}.acc-tone-amber .acc-metric-icon{background:#fff1d9;color:#d78b19}.acc-metric>span{color:#9fa8ba;font-size:12px;font-weight:800}.acc-metric>strong{display:block;margin-top:7px;font-size:26px}.acc-metric>small{display:block;margin-top:6px;color:#8e98ad}.acc-panel{overflow:hidden}.acc-panel-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid #2c3445}.acc-panel-head h3{margin:0}.acc-panel-head span{padding:5px 9px;border-radius:999px;background:#292f3e;color:#aeb6c6;font-size:10px}.acc-users>article{display:grid;grid-template-columns:minmax(240px,1fr) minmax(320px,2fr) auto;align-items:center;gap:16px;padding:15px 18px;border-bottom:1px solid #272f3f}.acc-users>article:last-child{border-bottom:0}.acc-user-main{display:flex;align-items:center;gap:11px}.acc-avatar{display:grid;width:38px;height:38px;place-items:center;border-radius:11px;background:#29245a;color:#b9b0ff;font-weight:900}.acc-user-main strong,.acc-user-main span{display:block}.acc-user-main strong{font-size:12px}.acc-user-main span{margin-top:4px;color:#8e98ad;font-size:10px}.acc-role-list{display:flex;gap:7px;flex-wrap:wrap}.acc-role-list button{display:grid;gap:3px;padding:7px 9px;border:1px solid #363f52;border-radius:9px;background:#252c3a;color:#fff;text-align:left;cursor:pointer}.acc-role-list button strong{font-size:10px}.acc-role-list button span,.acc-role-list>span{color:#8e98ad;font-size:8px}.acc-status{padding:7px 10px;border:0;border-radius:999px;font:inherit;font-size:9px;font-weight:900;cursor:pointer}.acc-status-active{background:#193b31;color:#72dfb7}.acc-status-disabled{background:#4b252d;color:#ff909c}.acc-role-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;padding:16px}.acc-role-grid>article{display:grid;gap:14px;padding:16px;border:1px solid #30384a;border-radius:14px;background:#1d2330}.acc-role-grid>article>div>span{color:#8f83f4;font-size:9px;font-weight:900;letter-spacing:.08em}.acc-role-grid h4{margin:5px 0 0;font-size:15px}.acc-role-grid p{margin:8px 0 0;color:#8e98ad;font-size:10px;line-height:1.45}.acc-permissions{display:flex;gap:6px;flex-wrap:wrap}.acc-permissions span{padding:5px 7px;border-radius:999px;background:#292f3e;color:#aeb6c6;font-size:8px}.acc-audit article{display:grid;grid-template-columns:1.2fr 1.2fr 1fr 1fr auto;gap:12px;padding:13px 18px;border-bottom:1px solid #272f3f}.acc-audit article:last-child{border-bottom:0}.acc-audit strong{font-size:10px}.acc-audit span,.acc-audit time{color:#8e98ad;font-size:9px}.acc-empty{padding:20px;color:#8e98ad}.acc-error{padding:14px;border-radius:11px;background:#ffecef;color:#ad3442}.acc-backdrop{position:fixed;z-index:1600;inset:0;display:grid;place-items:center;padding:20px;background:rgba(7,11,18,.62);backdrop-filter:blur(5px)}.acc-modal{width:min(520px,96vw);max-height:92vh;overflow:auto;padding:22px;border:1px solid #343d50;border-radius:18px;background:#171c28;color:#f4f6fc}.acc-modal header{display:flex;justify-content:space-between}.acc-modal header span{color:#8f83f4;font-size:10px;font-weight:900;letter-spacing:.1em}.acc-modal h3{margin:5px 0 0}.acc-modal header button{display:grid;width:34px;height:34px;place-items:center;border:1px solid #343d50;border-radius:9px;background:#202635;color:#fff}.acc-modal label{display:grid;gap:7px;margin-top:15px;color:#a4adbf;font-size:11px}.acc-modal input,.acc-modal select{height:42px;padding:0 12px;border:1px solid #343d50;border-radius:10px;background:#101521;color:#fff;font:inherit}.acc-save{display:flex;width:100%;height:43px;align-items:center;justify-content:center;gap:8px;margin-top:20px;border:0;border-radius:11px;background:#6758e8;color:#fff;font:inherit;font-weight:900}@media(max-width:1100px){.acc-metrics{grid-template-columns:1fr 1fr}.acc-role-grid{grid-template-columns:1fr 1fr}.acc-users>article{grid-template-columns:1fr}.acc-audit article{grid-template-columns:1fr 1fr}}@media(max-width:700px){.acc-hero{align-items:flex-start;flex-direction:column}.acc-metrics,.acc-role-grid{grid-template-columns:1fr}.acc-audit article{grid-template-columns:1fr}}
+/* Stage 13.1 — compact role matrix */
+.acc-role-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(280px, 1fr)) !important;
+  gap: 14px !important;
+  align-items: stretch !important;
+}
+.acc-role-grid > article {
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 300px !important;
+  padding: 18px !important;
+  border: 1px solid #30384a !important;
+  border-radius: 16px !important;
+  background: #1d2330 !important;
+}
+.acc-role-grid > article > div:first-child {
+  min-height: 118px !important;
+}
+.acc-role-grid > article > div:first-child > span {
+  display: block !important;
+  color: #8f83f4 !important;
+  font-size: 11px !important;
+  font-weight: 900 !important;
+  line-height: 1.2 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+}
+.acc-role-grid h4 {
+  margin: 8px 0 0 !important;
+  color: #f4f6fc !important;
+  font-size: 18px !important;
+  line-height: 1.2 !important;
+}
+.acc-role-grid p {
+  margin: 10px 0 0 !important;
+  color: #9aa4b7 !important;
+  font-size: 12px !important;
+  line-height: 1.45 !important;
+}
+.acc-permissions {
+  display: flex !important;
+  align-content: flex-start !important;
+  gap: 7px !important;
+  flex-wrap: wrap !important;
+  margin-top: auto !important;
+}
+.acc-permissions span {
+  display: inline-flex !important;
+  align-items: center !important;
+  min-height: 27px !important;
+  padding: 6px 9px !important;
+  border: 1px solid #343d50 !important;
+  border-radius: 9px !important;
+  background: #252c3a !important;
+  color: #b8adff !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  letter-spacing: 0.02em !important;
+  white-space: nowrap !important;
+}
+.acc-role-grid > article:nth-child(2) .acc-permissions span {
+  font-size: 9px !important;
+  padding-inline: 8px !important;
+}
+@media (max-width: 1250px) {
+  .acc-role-grid {
+    grid-template-columns: repeat(2, minmax(280px, 1fr)) !important;
+  }
+}
+@media (max-width: 760px) {
+  .acc-role-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .acc-role-grid > article {
+    min-height: auto !important;
+  }
+  .acc-role-grid > article > div:first-child {
+    min-height: auto !important;
+  }
+}
+
+/* ===== DARIAL LIGHT UI V4 ===== */
+.acc-metric,.acc-panel,.acc-role-grid>article,.acc-role-list button,.acc-modal,.acc-empty,.acc-audit article{
+  background:#fff!important;color:#172033!important;border-color:#e3e8f1!important;
+  box-shadow:0 8px 24px rgba(35,48,78,.045)!important}
+.acc-role-grid>article,.acc-role-list button,.acc-audit article{background:#f7f9fc!important;box-shadow:none!important}
+.acc-metric>span,.acc-metric>small,.acc-user-main span,.acc-role-grid p,.acc-role-list button span,.acc-audit span,.acc-audit time,.acc-empty{color:#707a91!important}
+.acc-metric>strong,.acc-user-main strong,.acc-role-grid h4,.acc-audit strong{color:#172033!important}
+.acc-modal input,.acc-modal select{background:#fff!important;color:#172033!important;border-color:#dfe5ef!important}

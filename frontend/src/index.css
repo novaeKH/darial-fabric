@@ -1,0 +1,52 @@
+
+/* Kafka DLQ — исправление контраста */
+.dlq-table-wrap,
+.dlq-details {
+  color: #e8edf6;
+}
+
+.dlq-table th {
+  color: #8996aa;
+  opacity: 1;
+}
+
+.dlq-table td,
+.dlq-details dd,
+.dlq-details h3,
+.dlq-details h4 {
+  color: #dfe7f3;
+}
+
+.dlq-table strong {
+  color: #f6f8fc;
+}
+
+.dlq-table small,
+.dlq-details small,
+.dlq-details dt,
+.dlq-empty-details {
+  color: #8d99ac;
+  opacity: 1;
+}
+
+.dlq-filters button,
+.dlq-toolbar button,
+.dlq-actions button,
+.dlq-details-header button {
+  color: #eef3fb;
+}
+
+.dlq-filters button.active {
+  background: #edf3ff;
+  border-color: #5d7cff;
+  color: #142033;
+}
+
+.dlq-actions button {
+  background: #1c2636;
+  border-color: #354258;
+}
+
+.dlq-details pre {
+  color: #dbe5f4;
+}

@@ -1,0 +1,303 @@
+
+/* =========================================================
+   Darial — unified light enterprise UI
+   Loaded last so it safely normalizes legacy dark components.
+   ========================================================= */
+
+:root {
+  --dui-surface: #ffffff;
+  --dui-surface-soft: #f7f8fc;
+  --dui-surface-accent: #f0efff;
+  --dui-border: #e1e6ef;
+  --dui-border-strong: #d4dbe7;
+  --dui-text: #172033;
+  --dui-muted: #748097;
+  --dui-primary: #6254d9;
+  --dui-primary-hover: #5144c6;
+  --dui-primary-soft: #eeecff;
+  --dui-success-soft: #e8f7ef;
+  --dui-success: #167a52;
+  --dui-danger-soft: #fff0f1;
+  --dui-danger: #b63e4e;
+  --dui-warning-soft: #fff4df;
+  --dui-warning: #a86513;
+  --dui-shadow: 0 8px 24px rgba(24, 38, 65, 0.055);
+}
+
+/* ---------- Shared card surfaces ---------- */
+
+.cc-metric,
+.cc-product-card,
+.cc-table-card,
+.acc-metric,
+.acc-panel,
+.rep-metric,
+.rep-panel,
+.rep-recommendation,
+.rep-formulas > div {
+  background: var(--dui-surface) !important;
+  color: var(--dui-text) !important;
+  border-color: var(--dui-border) !important;
+  box-shadow: var(--dui-shadow) !important;
+}
+
+.cc-metric strong,
+.cc-product-card h3,
+.cc-card-stats strong,
+.cc-table td strong,
+.acc-metric > strong,
+.acc-panel h3,
+.acc-user-main strong,
+.acc-role-grid h4,
+.acc-audit strong,
+.rep-metric > strong,
+.rep-panel h3,
+.rep-ranking strong,
+.rep-summary strong {
+  color: var(--dui-text) !important;
+}
+
+.cc-metric-label,
+.cc-metric small,
+.cc-product-card > p,
+.cc-card-footer,
+.cc-card-stats span,
+.cc-table th,
+.cc-table td small,
+.acc-metric > span,
+.acc-metric > small,
+.acc-user-main span,
+.acc-role-grid p,
+.acc-audit span,
+.acc-audit time,
+.rep-metric > span,
+.rep-metric > small,
+.rep-ranking div span {
+  color: var(--dui-muted) !important;
+}
+
+/* ---------- Products, agents, runs ---------- */
+
+.cc-card-stats > div {
+  background: var(--dui-surface-soft) !important;
+  border: 1px solid var(--dui-border) !important;
+}
+
+.cc-badge {
+  background: #eef1f6 !important;
+  color: #5f6b80 !important;
+}
+
+.cc-badge-good {
+  background: var(--dui-success-soft) !important;
+  color: var(--dui-success) !important;
+}
+
+.cc-table th {
+  background: #f7f8fb !important;
+  border-bottom-color: var(--dui-border) !important;
+}
+
+.cc-table td {
+  border-bottom-color: #edf0f5 !important;
+}
+
+.cc-table tbody tr:hover td {
+  background: #fafbfe !important;
+}
+
+/* ---------- Access / roles ---------- */
+
+.acc-role-grid > article {
+  background: var(--dui-surface-soft) !important;
+  border-color: var(--dui-border) !important;
+  color: var(--dui-text) !important;
+}
+
+.acc-avatar {
+  background: var(--dui-primary-soft) !important;
+  color: var(--dui-primary) !important;
+}
+
+.acc-role-list button {
+  background: var(--dui-surface) !important;
+  color: var(--dui-text) !important;
+  border-color: var(--dui-border-strong) !important;
+}
+
+.acc-role-list button:hover {
+  border-color: #aaa4ed !important;
+  background: #f8f7ff !important;
+}
+
+.acc-role-list button span,
+.acc-role-list > span {
+  color: var(--dui-muted) !important;
+}
+
+.acc-permissions span,
+.acc-panel-head span {
+  background: #eef1f6 !important;
+  color: #667187 !important;
+}
+
+.acc-users > article,
+.acc-audit article,
+.acc-panel-head {
+  border-color: #edf0f5 !important;
+}
+
+/* ---------- Report ranking blocks ---------- */
+
+.rep-ranking article {
+  background: transparent !important;
+  border-bottom-color: var(--dui-border) !important;
+}
+
+.rep-rank {
+  background: var(--dui-primary-soft) !important;
+  color: var(--dui-primary) !important;
+  border: 1px solid #ddd9ff !important;
+  box-shadow: none !important;
+}
+
+.rep-panel-head > span,
+.rep-panel-head em,
+.rep-recommendations-panel .rep-panel-head > span {
+  background: #f0f2f7 !important;
+  color: #667187 !important;
+  border: 1px solid var(--dui-border) !important;
+}
+
+.rep-chart-summary > div {
+  background: var(--dui-surface-soft) !important;
+  border-color: var(--dui-border) !important;
+}
+
+/* ---------- Buttons: replace near-black with Darial purple ---------- */
+
+.cc-header button,
+.acc-actions button,
+.rep-actions button,
+.rep-actions a,
+.acc-save {
+  background: var(--dui-primary) !important;
+  color: #ffffff !important;
+  border: 1px solid var(--dui-primary) !important;
+  box-shadow: 0 5px 14px rgba(98, 84, 217, 0.18) !important;
+}
+
+.cc-header button:hover,
+.acc-actions button:hover,
+.rep-actions button:hover,
+.rep-actions a:hover,
+.acc-save:hover {
+  background: var(--dui-primary-hover) !important;
+  border-color: var(--dui-primary-hover) !important;
+  transform: translateY(-1px);
+}
+
+.rep-actions label {
+  color: var(--dui-muted) !important;
+}
+
+.rep-actions input,
+.acc-modal input,
+.acc-modal select {
+  background: #ffffff !important;
+  color: var(--dui-text) !important;
+  border-color: var(--dui-border-strong) !important;
+}
+
+/* Secondary report controls stay calm, not black. */
+.rep-actions a:nth-last-child(2) {
+  background: #ffffff !important;
+  color: #49566d !important;
+  border-color: var(--dui-border-strong) !important;
+  box-shadow: none !important;
+}
+
+.rep-actions a:nth-last-child(2):hover {
+  background: #f7f8fc !important;
+  color: var(--dui-primary) !important;
+}
+
+/* ---------- Modals ---------- */
+
+.acc-modal {
+  background: #ffffff !important;
+  color: var(--dui-text) !important;
+  border-color: var(--dui-border) !important;
+  box-shadow: 0 24px 70px rgba(21, 32, 55, 0.22) !important;
+}
+
+.acc-modal header button {
+  background: #f4f6fa !important;
+  color: #4f5b70 !important;
+  border-color: var(--dui-border) !important;
+}
+
+.acc-modal label {
+  color: #68748a !important;
+}
+
+/* ---------- Statuses stay semantic ---------- */
+
+.acc-status-active {
+  background: var(--dui-success-soft) !important;
+  color: var(--dui-success) !important;
+}
+
+.acc-status-disabled {
+  background: var(--dui-danger-soft) !important;
+  color: var(--dui-danger) !important;
+}
+
+/* ---------- Hero blocks ---------- */
+
+.cc-header,
+.acc-hero,
+.rep-hero {
+  border-color: var(--dui-border-strong) !important;
+  background:
+    radial-gradient(circle at 88% 12%, rgba(110, 92, 232, .09), transparent 34%),
+    linear-gradient(135deg, #ffffff 0%, #faf9ff 100%) !important;
+  box-shadow: var(--dui-shadow) !important;
+}
+
+/* ---------- Remove accidental high-contrast legacy styling ---------- */
+
+.cc-page,
+.acc-page,
+.rep-page {
+  color: var(--dui-text) !important;
+}
+
+.cc-kicker,
+.cc-eyebrow,
+.acc-eyebrow,
+.rep-eyebrow {
+  color: var(--dui-primary) !important;
+}
+
+@media (max-width: 760px) {
+  .rep-actions button,
+  .rep-actions a,
+  .cc-header button,
+  .acc-actions button {
+    box-shadow: none !important;
+  }
+}
+
+@media print {
+  .rep-rank {
+    background: #f0efff !important;
+    color: #5144c6 !important;
+    border-color: #d8d4ff !important;
+  }
+
+  .rep-panel-head > span {
+    background: #f2f3f6 !important;
+    color: #4f596b !important;
+  }
+}

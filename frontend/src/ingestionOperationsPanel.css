@@ -1,0 +1,19 @@
+.ops-panel{overflow:hidden;border:1px solid #2c3445;border-radius:18px;background:#171c28;color:#f4f6fc}
+.ops-head{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;padding:18px;border-bottom:1px solid #2c3445}
+.ops-head>div>span{color:#8f83f4;font-size:10px;font-weight:900;letter-spacing:.1em}.ops-head h3{margin:5px 0 0;font-size:18px}.ops-head p{max-width:720px;margin:7px 0 0;color:#8e98ad;font-size:11px;line-height:1.5}
+.ops-head button,.ops-dead button,.ops-list button{display:inline-flex;align-items:center;gap:6px;border:1px solid #343d50;border-radius:9px;background:#252c3a;color:#fff;font:inherit;font-size:10px;font-weight:800;cursor:pointer}
+.ops-head button{min-height:38px;padding:0 12px}.ops-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;padding:16px}
+.ops-stats>div{display:grid;grid-template-columns:auto 1fr;gap:4px 9px;padding:13px;border-radius:11px;background:#202635}
+.ops-stats svg{grid-row:1/3;color:#8f83f4}.ops-stats span{color:#8e98ad;font-size:10px}.ops-stats strong{font-size:17px}
+.ops-error{margin:14px 16px 0;padding:11px;border-radius:9px;background:#4b252d;color:#ffb0ba;font-size:11px}
+.ops-dead{border-top:1px solid #2c3445}.ops-dead-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px}.ops-dead-head>div{display:flex;align-items:center;gap:8px;color:#ff9aa5}.ops-dead-head button{padding:8px 10px}
+.ops-list article{display:grid;grid-template-columns:1fr 1.5fr auto auto;align-items:center;gap:12px;padding:13px 16px;border-top:1px solid #272f3f}
+.ops-list strong,.ops-list span{display:block}.ops-list strong{font-size:11px}.ops-list span,.ops-list time{margin-top:3px;color:#8e98ad;font-size:9px}.ops-list button{padding:8px 10px}
+@media(max-width:1000px){.ops-stats{grid-template-columns:1fr 1fr}.ops-list article{grid-template-columns:1fr}.ops-list time{margin-top:0}}
+
+/* ===== DARIAL LIGHT UI V4 ===== */
+.ops-panel,.ops-stats>div,.ops-dead,.ops-list article{
+  background:#fff!important;color:#172033!important;border-color:#e3e8f1!important;
+  box-shadow:0 8px 24px rgba(35,48,78,.045)!important}
+.ops-stats>div,.ops-list article{background:#f7f9fc!important;box-shadow:none!important}
+.ops-panel p,.ops-stats span,.ops-list span{color:#707a91!important}
