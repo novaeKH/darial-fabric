@@ -4,6 +4,16 @@
 
 Takt ведёт единый реестр AI-продуктов и агентов, принимает телеметрию их запусков, рассчитывает стоимость LLM-вызовов, связывает расходы с бизнес-результатами и фиксирует нарушения политик.
 
+<p align="center">
+  <img src="./docs/screenshots/takt-overview.png" alt="Takt — обзор AI-систем" width="100%">
+</p>
+
+<details>
+<summary><b>Управленческий отчёт</b></summary>
+<br>
+<img src="./docs/screenshots/takt-report.png" alt="Takt — отчёт по экономике и эффективности AI-систем" width="100%">
+</details>
+
 ```text
 Registry → Telemetry → Runs → Cost → Outcome → Governance → Report
 ```
