@@ -1,11 +1,11 @@
 # DEMO_SCRIPT.md
 
-# Darial — сценарий защиты на 5–7 минут
+# Takt — сценарий защиты на 5–7 минут
 
 ## 0. Подготовка перед показом
 
 ```bash
-cd ~/Projects/Darial
+cd ~/Projects/takt-ai-control-center
 docker compose up -d
 docker compose ps
 ```
@@ -30,7 +30,7 @@ docker compose ps
 - какие нарушения политик происходят;
 - кто имеет доступ к данным и управлению.
 
-Darial объединяет AI Observability, AI FinOps и Governance.
+Takt объединяет AI Observability, AI FinOps и Governance.
 
 ---
 
@@ -179,7 +179,7 @@ ROI = (Estimated business value - Total cost) / Total cost
 
 ## 7. Завершение — 20 секунд
 
-Darial отвечает на три вопроса:
+Takt отвечает на три вопроса:
 
 1. **Что делают AI-системы?**
 2. **Сколько это стоит?**
