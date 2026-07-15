@@ -1,10 +1,25 @@
 import unittest
 from unittest.mock import patch
 
-from darial_sdk import DarialClient, sanitize_value
+from darial_sdk import DarialClient, TaktClient, sanitize_value
 
 
 class SDKTests(unittest.TestCase):
+    def test_takt_alias_and_environment(self):
+        with patch.dict(
+            "os.environ",
+            {
+                "TAKT_BASE_URL": "http://takt.local",
+                "TAKT_API_KEY": "tk_test",
+            },
+            clear=True,
+        ):
+            client = TaktClient.from_env()
+
+        self.assertIs(TaktClient, DarialClient)
+        self.assertEqual(client.base_url, "http://takt.local")
+        self.assertEqual(client.api_key, "tk_test")
+
     def test_sanitization(self):
         cleaned = sanitize_value({
             "prompt": "secret",
