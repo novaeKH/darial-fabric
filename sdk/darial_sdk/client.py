@@ -51,13 +51,33 @@ class DarialClient:
 
     @classmethod
     def from_env(cls) -> "DarialClient":
+        api_key = os.getenv("TAKT_API_KEY") or os.getenv("DARIAL_API_KEY")
+        if not api_key:
+            raise KeyError("TAKT_API_KEY")
+
         return cls(
-            base_url=os.getenv("DARIAL_BASE_URL", "http://localhost:8000"),
-            api_key=os.environ["DARIAL_API_KEY"],
-            timeout=int(os.getenv("DARIAL_TIMEOUT", "10")),
-            batch_size=int(os.getenv("DARIAL_BATCH_SIZE", "50")),
-            max_queue_size=int(os.getenv("DARIAL_MAX_QUEUE_SIZE", "1000")),
-            max_retries=int(os.getenv("DARIAL_MAX_RETRIES", "3")),
+            base_url=(
+                os.getenv("TAKT_BASE_URL")
+                or os.getenv("DARIAL_BASE_URL")
+                or "http://localhost:8000"
+            ),
+            api_key=api_key,
+            timeout=int(
+                os.getenv("TAKT_TIMEOUT")
+                or os.getenv("DARIAL_TIMEOUT", "10")
+            ),
+            batch_size=int(
+                os.getenv("TAKT_BATCH_SIZE")
+                or os.getenv("DARIAL_BATCH_SIZE", "50")
+            ),
+            max_queue_size=int(
+                os.getenv("TAKT_MAX_QUEUE_SIZE")
+                or os.getenv("DARIAL_MAX_QUEUE_SIZE", "1000")
+            ),
+            max_retries=int(
+                os.getenv("TAKT_MAX_RETRIES")
+                or os.getenv("DARIAL_MAX_RETRIES", "3")
+            ),
         )
 
     def _post(self, path: str, payload: dict[str, Any]) -> dict[str, Any]:
