@@ -1,27 +1,30 @@
 import argparse
 import os
 
-from darial_sdk import DarialClient
+from darial_sdk import TaktClient
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--api-key", default=os.getenv("DARIAL_API_KEY"))
-    parser.add_argument("--product-id", default=os.getenv("DARIAL_PRODUCT_ID"))
+    parser.add_argument("--api-key", default=os.getenv("TAKT_API_KEY") or os.getenv("DARIAL_API_KEY"))
+    parser.add_argument("--product-id", default=os.getenv("TAKT_PRODUCT_ID") or os.getenv("DARIAL_PRODUCT_ID"))
     parser.add_argument(
         "--agent-name",
         default="Legal Contract Agent",
     )
     parser.add_argument(
         "--base-url",
-        default=os.getenv("DARIAL_BASE_URL", "http://localhost:8000"),
+        default=(
+            os.getenv("TAKT_BASE_URL")
+            or os.getenv("DARIAL_BASE_URL", "http://localhost:8000")
+        ),
     )
     args = parser.parse_args()
 
     if not args.api_key:
-        raise SystemExit("Передай --api-key или DARIAL_API_KEY")
+        raise SystemExit("Передай --api-key или TAKT_API_KEY")
 
-    client = DarialClient(args.base_url, args.api_key, batch_size=10)
+    client = TaktClient(args.base_url, args.api_key, batch_size=10)
 
     with client.run(
         "contract_review",
