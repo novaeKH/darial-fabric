@@ -299,16 +299,16 @@ chmod +x start.sh stop.sh
 
 ```bash
 export PYTHONPATH="$PWD/sdk"
-export DARIAL_BASE_URL="http://localhost:8000"
-export DARIAL_API_KEY="dr_..."
+export TAKT_BASE_URL="http://localhost:8000"
+export TAKT_API_KEY="tk_..."
 ```
 
 Пример интеграции:
 
 ```python
-from darial_sdk import DarialClient
+from darial_sdk import TaktClient
 
-client = DarialClient.from_env()
+client = TaktClient.from_env()
 
 with client.run(
     workflow="contract-review",
@@ -343,7 +343,7 @@ with client.run(
 
 ```bash
 PYTHONPATH=sdk python sdk/send_demo_telemetry.py \
-  --api-key "$DARIAL_API_KEY" \
+  --api-key "$TAKT_API_KEY" \
   --product-id "PRODUCT_ID" \
   --agent-name "Legal Contract Agent"
 ```
@@ -458,4 +458,4 @@ chmod +x scripts/final_smoke_test.sh
 - access graph;
 - audit log.
 
-Модуль используется как отдельный security-контур и не является главным сценарием интерфейса Darial.
+Модуль используется как отдельный security-контур и не является главным сценарием интерфейса Takt.
